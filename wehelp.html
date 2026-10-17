@@ -1,0 +1,1617 @@
+<title>WeHelp</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,400..600&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout concept: a travel-document system — ticket-stub cards track each
+   application like a boarding pass, a passport-style stamp badge carries
+   country + status everywhere, and a dense table powers the explorer. */
+:root{
+  --bg:#F4F6F9; --surface:#FFFFFF; --surface-2:#EBEEF4;
+  --ink:#121B30; --muted:#5B657C; --faint:#8A93A8;
+  --line:#D7DCE6; --accent:#C8791F; --accent-ink:#5C3410; --accent-soft:#F6E4C9;
+  --good:#1F7A4D; --good-soft:#DCF0E3; --warn:#B4600F; --warn-soft:#FBE7CE;
+  --bad:#9C3B3B; --bad-soft:#F6DEDE; --info:#2A5CAA; --info-soft:#DCE6F8;
+  --shadow:0 1px 2px rgba(18,27,48,.06), 0 8px 24px -12px rgba(18,27,48,.16);
+  --radius:14px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1220; --surface:#161C2E; --surface-2:#1E2538;
+    --ink:#EDEFF5; --muted:#A9AFC2; --faint:#767E93;
+    --line:#2B3349; --accent:#E3A33E; --accent-ink:#2B1A08; --accent-soft:#3A2A13;
+    --good:#4EBE84; --good-soft:#163428; --warn:#E3A33E; --warn-soft:#3A2A13;
+    --bad:#E08080; --bad-soft:#3A1F1F; --info:#7FA8E8; --info-soft:#19263F;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1220; --surface:#161C2E; --surface-2:#1E2538;
+  --ink:#EDEFF5; --muted:#A9AFC2; --faint:#767E93;
+  --line:#2B3349; --accent:#E3A33E; --accent-ink:#2B1A08; --accent-soft:#3A2A13;
+  --good:#4EBE84; --good-soft:#163428; --warn:#E3A33E; --warn-soft:#3A2A13;
+  --bad:#E08080; --bad-soft:#3A1F1F; --info:#7FA8E8; --info-soft:#19263F;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;padding-bottom:40px}
+h1,h2,h3,.disp{font-family:"Fraunces",Georgia,serif;text-wrap:balance;letter-spacing:-.01em}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:20px}
+.hide{display:none!important}
+
+/* ---------- Sidebar nav ---------- */
+:root{ --sidebar-w:244px }
+.sidebar-toggle-float{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:calc(14px + env(safe-area-inset-left,0px));z-index:70;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);box-shadow:var(--shadow);cursor:pointer;font-size:16px;display:none;align-items:center;justify-content:center}
+body:not(.sidebar-open) .sidebar-toggle-float{display:flex}
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(10,14,24,.45);z-index:55}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--line);z-index:60;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .22s ease;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body.sidebar-open .sidebar{transform:translateX(0)}
+.sidebar-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:16px 14px}
+.brand{display:flex;align-items:center;gap:8px;cursor:pointer;border:none;background:none;padding:0;color:var(--ink)}
+.brand .mark{width:30px;height:30px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--accent-ink);font-family:"Fraunces",serif;font-weight:700;font-size:16px;flex:none}
+.brand .word{font-family:"Fraunces",serif;font-weight:600;font-size:19px}
+.sidebar-toggle-inline{background:none;border:1px solid var(--line);border-radius:8px;width:30px;height:30px;cursor:pointer;color:var(--muted);flex:none}
+.sidebar-nav{display:flex;flex-direction:column;gap:2px;padding:6px 10px}
+.sidebar-nav button{display:flex;align-items:center;text-align:left;background:none;border:none;padding:10px 12px;border-radius:9px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;width:100%}
+.sidebar-nav button:hover{background:var(--surface-2);color:var(--ink)}
+.sidebar-nav button.active{background:var(--accent-soft);color:var(--accent-ink)}
+.sidebar-foot{margin-top:auto;display:flex;flex-direction:column;gap:8px;padding:14px}
+.sidebar-user{display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px;cursor:pointer;text-align:left;width:100%}
+.sidebar-user:hover{border-color:var(--accent)}
+.sidebar-avatar{width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-weight:700;font-size:13px;flex:none}
+.sidebar-user-text{display:flex;flex-direction:column;gap:1px;min-width:0}
+.sidebar-user-text b{font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-user-text span{font-size:11px;color:var(--muted)}
+.nav-count{display:flex;align-items:center;justify-content:center;gap:5px;font-size:12.5px;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:7px 10px;cursor:pointer;font-weight:600;width:100%}
+.nav-count b{color:var(--ink);font-family:"IBM Plex Mono",monospace}
+.main-area{padding-top:calc(60px + env(safe-area-inset-top,0px))}
+@media (min-width:760px){
+  body.sidebar-open .main-area{margin-left:var(--sidebar-w)}
+  .sidebar-backdrop{display:none!important}
+}
+@media (max-width:759px){
+  .sidebar{width:min(var(--sidebar-w),85vw)}
+  body.sidebar-open .sidebar-backdrop{display:block}
+}
+
+/* ---------- Generic blocks ---------- */
+.section{padding-block:40px}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:10px;padding:10px 16px;font-weight:700;font-size:13.5px;cursor:pointer;border:1px solid transparent;text-decoration:none}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{filter:brightness(1.06)}
+.btn-ghost{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.btn-ghost:hover{background:var(--surface-2)}
+.btn-sm{padding:7px 12px;font-size:12.5px;border-radius:8px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:999px;letter-spacing:.01em}
+.stamp{display:inline-flex;align-items:center;gap:5px;font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;letter-spacing:.04em;border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--muted);text-transform:uppercase}
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12.5px;font-weight:700;color:var(--muted)}
+.field input,.field select,.field textarea{font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);width:100%}
+.field textarea{resize:vertical;min-height:90px;line-height:1.5}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.hint{font-size:12px;color:var(--faint)}
+.divider{height:1px;background:var(--line);margin-block:20px}
+.copybtn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:5px 9px;font-size:12px;cursor:pointer;color:var(--ink);font-family:"IBM Plex Mono",monospace}
+
+/* ---------- Home ---------- */
+.hero{padding-block:52px 36px;display:grid;grid-template-columns:1.2fr .8fr;gap:40px;align-items:center}
+@media (max-width:760px){.hero{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(32px,5vw,48px);font-weight:600;margin:0 0 14px;line-height:1.05}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero p.lede{font-size:16.5px;color:var(--muted);max-width:46ch;margin:0 0 22px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+.todo-card{padding:20px}
+.todo-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.todo-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.todo-list button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;background:none;border:none;border-top:1px solid var(--line);padding:11px 2px;text-align:left;cursor:pointer;color:var(--ink);font-size:13.5px;font-weight:600}
+.todo-list li:first-child button{border-top:none}
+.todo-list button:hover span:first-child{color:var(--accent)}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+@media (max-width:760px){.dash-grid{grid-template-columns:1fr}}
+.deadline-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.deadline-row:first-of-type{border-top:none}
+.feed-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.feed-list li{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px;font-weight:600}
+.feed-list li:first-child{border-top:none}
+.quick-links{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+@media (max-width:620px){.quick-links{grid-template-columns:1fr 1fr}}
+.quick-link{padding:16px;display:flex;flex-direction:column;gap:4px;cursor:pointer;text-align:left;border:1px solid var(--line)}
+.quick-link:hover{border-color:var(--accent)}
+.quick-link b{font-size:13.5px}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px}
+@media (max-width:620px){.stat-row{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 14px}
+.stat .n{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;color:var(--accent)}
+.stat .l{font-size:12px;color:var(--muted);margin-top:2px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media (max-width:760px){.steps{grid-template-columns:1fr 1fr}}
+@media (max-width:460px){.steps{grid-template-columns:1fr}}
+.step{padding:18px}
+.step .k{font-family:"IBM Plex Mono",monospace;color:var(--accent);font-weight:600;font-size:13px}
+.step h3{font-size:15.5px;margin:8px 0 6px}
+.step p{margin:0;font-size:13px;color:var(--muted)}
+.advisor{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;padding:26px}
+@media (max-width:760px){.advisor{grid-template-columns:1fr}}
+.contact-chip{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px}
+.contact-chip span{font-family:"IBM Plex Mono",monospace;font-size:13px}
+
+/* ---------- Explore ---------- */
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;padding:16px;margin-bottom:18px}
+.chip-row{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--muted)}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+:root[data-theme="dark"] .chip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}}
+.uni-card{display:flex;flex-direction:column;gap:10px;padding:18px;cursor:pointer}
+.uni-card:hover{border-color:var(--accent)}
+.uni-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.uni-name{font-family:"Fraunces",serif;font-size:17px;font-weight:600;line-height:1.2}
+.uni-loc{font-size:12.5px;color:var(--muted);margin-top:3px}
+.uni-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.uni-stats b{display:block;color:var(--ink);font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600}
+.uni-foot{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.star-btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--faint);flex:none}
+.star-btn.on{color:var(--accent);border-color:var(--accent)}
+.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+
+/* ---------- University detail ---------- */
+.detail-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:18px;overflow-x:auto}
+.tab{background:none;border:none;padding:10px 4px;margin-right:18px;font-weight:700;font-size:13.5px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tab.active{color:var(--ink);border-color:var(--accent)}
+.kv{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media (max-width:560px){.kv{grid-template-columns:1fr}}
+.kv-item{padding:14px;background:var(--surface-2);border-radius:10px}
+.kv-item .l{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+.kv-item .v{font-family:"IBM Plex Mono",monospace;font-size:15px;margin-top:4px;font-weight:600}
+.fact-box{margin-top:16px;padding:14px 16px;border:1px dashed var(--accent);border-radius:10px;background:var(--accent-soft);color:var(--accent-ink);font-size:13.5px}
+.fact-k{display:block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;opacity:.75}
+.official-link{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font-weight:700;font-size:13px;color:var(--ink);text-decoration:none}
+.official-link:hover{border-color:var(--accent)}
+.official-link span{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:12px;color:var(--muted)}
+.taglist{display:flex;flex-wrap:wrap;gap:8px}
+.tag{background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12.5px}
+
+/* ---------- Compare ---------- */
+.cmp-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.cmp-table th,.cmp-table td{border-bottom:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+.cmp-table th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+.cmp-table td.k{color:var(--muted);font-weight:600;white-space:nowrap}
+.cmp-table .mono-cell{font-family:"IBM Plex Mono",monospace}
+.cmp-scroll{overflow-x:auto}
+.cmp-pick{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.cmp-slot{border:1px dashed var(--line);border-radius:10px;padding:12px;min-width:160px;flex:1;font-size:13px;color:var(--muted);text-align:center}
+
+/* ---------- Profile ---------- */
+.progress-ring{width:66px;height:66px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:14px;background:conic-gradient(var(--accent) calc(var(--pct)*1%), var(--surface-2) 0)}
+.progress-ring .hole{width:50px;height:50px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center}
+.profile-head{display:flex;gap:16px;align-items:center;padding:18px;margin-bottom:20px;flex-wrap:wrap}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media (max-width:620px){.form-grid{grid-template-columns:1fr}}
+.doc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+.doc-row.done{border-color:var(--good)}
+.doc-info{display:flex;align-items:center;gap:10px}
+.doc-dot{width:10px;height:10px;border-radius:50%;background:var(--line);flex:none}
+.doc-dot.on{background:var(--good)}
+.doc-name{font-size:12px;color:var(--faint)}
+.file-btn{position:relative;overflow:hidden}
+.file-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.activity-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.activity-top{display:flex;align-items:center;gap:10px}
+.add-row{border:1px dashed var(--line);border-radius:10px;padding:14px;margin-top:14px;background:var(--surface-2)}
+.save-toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:var(--shadow);opacity:0;transition:opacity .25s, transform .25s;pointer-events:none;z-index:200}
+.save-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- Applications / ticket stubs ---------- */
+.stub{display:grid;grid-template-columns:1fr auto;align-items:stretch;overflow:hidden;position:relative;margin-bottom:16px}
+.stub-main{padding:18px 18px 16px}
+.stub-side{width:140px;background:var(--surface-2);border-left:1px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:14px;position:relative}
+.stub::before,.stub::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:var(--bg);right:122px;z-index:2}
+.stub::before{top:-9px}
+.stub::after{bottom:-9px}
+@media (max-width:560px){.stub{grid-template-columns:1fr}.stub-side{width:auto;border-left:none;border-top:1px dashed var(--line);flex-direction:row;justify-content:space-between}.stub::before,.stub::after{display:none}}
+.stub-title{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.stub-name{font-family:"Fraunces",serif;font-size:17px;font-weight:600}
+.timeline{display:flex;gap:4px;margin-top:12px}
+.tl-seg{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.tl-seg.on{background:var(--accent)}
+.tl-labels{display:flex;justify-content:space-between;font-size:10.5px;color:var(--faint);margin-top:4px;text-transform:uppercase;letter-spacing:.04em}
+.dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+@media (max-width:620px){.dash-stats{grid-template-columns:repeat(2,1fr)}}
+.bar-track{height:6px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.bar-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .3s}
+.checklist-mini{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.ck-chip{font-size:11px;font-weight:600;padding:4px 9px;border-radius:999px;background:var(--surface-2);color:var(--faint);border:1px solid var(--line)}
+.ck-chip.on{background:var(--good-soft);color:var(--good);border-color:transparent}
+.demo-control{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.demo-control label{font-size:11px;color:var(--faint);font-weight:600}
+.demo-control select{font:inherit;font-size:12.5px;padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--muted)}
+
+/* ---------- Apply flow ---------- */
+.stepper{display:flex;gap:6px;margin-bottom:24px}
+.stepper .seg{flex:1;height:4px;background:var(--line);border-radius:3px}
+.stepper .seg.done{background:var(--good)}
+.stepper .seg.cur{background:var(--accent)}
+.step-label{display:flex;justify-content:space-between;font-size:11.5px;color:var(--faint);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+.check-row{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.check-row:last-child{border-bottom:none}
+.check-mark{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--line);flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;margin-top:1px}
+.check-mark.ok{background:var(--good);border-color:var(--good);color:#fff}
+.check-mark.bad{border-color:var(--warn)}
+
+/* ---------- Resources ---------- */
+.res-card{padding:18px;display:flex;flex-direction:column;gap:8px}
+.res-tag{align-self:flex-start}
+
+footer.site{padding:30px 0 10px;text-align:center}
+footer.site p{font-size:12px;color:var(--faint);max-width:520px;margin:0 auto}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+</style>
+
+<button class="sidebar-toggle-float" id="sidebarFloatBtn" aria-label="Open menu">☰</button>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <button class="brand" data-go="home" aria-label="WeHelp home">
+      <span class="mark">W</span><span class="word">WeHelp</span>
+    </button>
+    <button class="sidebar-toggle-inline" id="sidebarCloseBtn" aria-label="Close menu">✕</button>
+  </div>
+  <nav class="sidebar-nav" id="navLinks">
+    <button data-go="dashboard">Dashboard</button>
+    <button data-go="explore">Explore</button>
+    <button data-go="compare">Compare</button>
+    <button data-go="profile">My Profile</button>
+    <button data-go="applications">My Colleges</button>
+    <button data-go="resources">Resources</button>
+  </nav>
+  <div class="sidebar-foot">
+    <button class="sidebar-user" data-go="profile" id="sidebarUser">
+      <span class="sidebar-avatar" id="sidebarAvatar">A</span>
+      <span class="sidebar-user-text"><b id="sidebarUserName">—</b><span id="sidebarUserSub">0% of profile done</span></span>
+    </button>
+    <button class="nav-count" data-go="applications" id="appsChip">⚑ <b id="appsCount">0</b> colleges</button>
+  </div>
+</aside>
+
+<div class="main-area">
+  <div id="app" class="wrap"></div>
+
+  <footer class="site">
+    <p>University figures (tuition, rankings, requirements) are compiled from public sources and should be verified before advising a student. No data leaves this browser — everything here is saved locally, with no backend yet.</p>
+  </footer>
+</div>
+<div class="save-toast" id="toast">Saved</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ===================== DATA ===================== */
+var UNIS = [
+  {
+    id:"seoul-national-university", name:"Seoul National University", city:"Seoul", country:"South Korea", cc:"KR",
+    rank:"QS #38 · #1 in Korea", selectivity:"Extremely Selective",
+    tuitionUSD:6000, tuitionNote:"≈6–9M KRW/yr (≈$4,500–6,500) — same fee as domestic students",
+    scholarship:true, scholarshipNote:"Most international students receive partial-to-full tuition scholarships; many awards are automatic, with no separate application.",
+    ielts:6.0, toefl:80, duration:"4 years", language:"English or Korean (TOPIK 3+)",
+    deadline:"September (fall round)", intake:"March & September",
+    programs:["Engineering","Economics","Computer Science","Social Sciences","Natural Sciences"],
+    highlight:"Korea's most selective university",
+    blurb:"Korea's highest-ranked university, on a wooded campus in southern Seoul — the one name every Korean parent recognizes instantly.",
+    intlPct:"~8% international", livingCostUSD:900, appFee:"₩80,000 (~$60)",
+    fact:"SNU's Gwanak campus is so large it runs its own shuttle bus system and has a mountain trail inside the gates.",
+    supplementPrompt:"Why SNU over Korea's other top research universities, specifically for this major?", supplementWords:150,
+    applyUrl:"en.snu.ac.kr"
+  },
+  {
+    id:"kaist", name:"KAIST", city:"Daejeon", country:"South Korea", cc:"KR",
+    rank:"QS #56 (2026)", selectivity:"Extremely Selective",
+    tuitionUSD:0, tuitionNote:"$0 for ~90%+ of international undergrads",
+    scholarship:true, scholarshipNote:"The KAIST Scholarship covers full tuition plus a monthly stipend and health insurance for nearly every admitted international undergraduate.",
+    ielts:6.5, toefl:83, duration:"4 years", language:"English",
+    deadline:"Varies by round", intake:"March & September",
+    programs:["Computer Science","Electrical Engineering","Mechanical Engineering","Physics","Bio & Brain Engineering"],
+    highlight:"Fully funded for almost everyone admitted",
+    blurb:"South Korea's answer to MIT, in the research city of Daejeon. More than 9 in 10 international undergrads study on a scholarship that covers tuition, housing and a stipend.",
+    intlPct:"~7% international", livingCostUSD:700, appFee:"≈$75 (₩100,000)",
+    fact:"Students bike between labs on a campus built around its own research reactor and a human-powered aircraft hangar.",
+    supplementPrompt:"Describe a technical project you've built, or one you're itching to build.", supplementWords:150,
+    applyUrl:"admission.kaist.ac.kr"
+  },
+  {
+    id:"korea-university", name:"Korea University", city:"Seoul", country:"South Korea", cc:"KR",
+    rank:"Historic highs in QS 2026 · the 'K' in SKY", selectivity:"Extremely Selective",
+    tuitionUSD:7000, tuitionNote:"≈$6,500–8,000/yr, varies by college",
+    scholarship:true, scholarshipNote:"Full-tuition Anam Global & KU STEM scholarships for GPA 3.5+; GPA 3.0+ unlocks partial awards — most are automatic from the admission evaluation, no extra application.",
+    ielts:6.0, toefl:80, duration:"4 years", language:"English or Korean",
+    deadline:"September (fall round)", intake:"March & September",
+    programs:["Business","International Studies","Engineering","Political Science","Life Sciences"],
+    highlight:"One of Korea's three 'SKY' universities",
+    blurb:"One of Korea's three most prestigious universities (the 'K' in SKY), with a stone-gothic campus in central Seoul and one of the country's most active alumni networks.",
+    intlPct:"~9% international", livingCostUSD:950, appFee:"₩140,000 (~$105)",
+    fact:"Korea University's 1934 main quad has appeared in more K-drama campus scenes than any other Korean university.",
+    supplementPrompt:"What would you bring to KU's Anam campus beyond your grades?", supplementWords:150,
+    applyUrl:"oia.korea.ac.kr"
+  },
+  {
+    id:"yonsei-university", name:"Yonsei University", city:"Seoul", country:"South Korea", cc:"KR",
+    rank:"Top 3 in Korea · QS top 80 band", selectivity:"Very Selective",
+    tuitionUSD:9500, tuitionNote:"≈$9,500/yr, Underwood International College",
+    scholarship:true, scholarshipNote:"Merit scholarships of 30–100% for strong GPA, renewed each semester.",
+    ielts:6.5, toefl:79, duration:"4 years", language:"English (Underwood International College)",
+    deadline:"September, two rounds", intake:"March & September",
+    programs:["Liberal Arts (UIC)","Business","Economics","Life Science","Political Science"],
+    highlight:"Seoul's most international campus",
+    blurb:"One of Korea's three most selective universities, with a dedicated English-language college — Underwood International — for students who aren't ready to study in Korean yet.",
+    intlPct:"~12% international (UIC)", livingCostUSD:900, appFee:"$90",
+    fact:"The Sinchon campus sits inside Seoul's biggest student district — three other major universities are a 20-minute walk away.",
+    supplementPrompt:"Why Seoul specifically, and why Underwood International, not just \"Korea\"?", supplementWords:150,
+    applyUrl:"oia.yonsei.ac.kr"
+  },
+  {
+    id:"postech", name:"POSTECH", city:"Pohang", country:"South Korea", cc:"KR",
+    rank:"QS #83–106 band · Korea's top STEM-only school", selectivity:"Extremely Selective",
+    tuitionUSD:0, tuitionNote:"$0 — every admitted international student is fully scholarshipped",
+    scholarship:true, scholarshipNote:"Full tuition waiver plus a monthly living allowance and one-way airfare reimbursement; renewal needs a 3.0/4.3 GPA.",
+    ielts:6.5, toefl:88, duration:"4 years", language:"English",
+    deadline:"September–November (international track)", intake:"September",
+    programs:["Physics","Chemistry","Materials Science","Computer Science","Mechanical Engineering"],
+    highlight:"Fully funded, Korea's top STEM-only school",
+    blurb:"A small, research-only university often called 'Korea's Caltech' — its first dedicated international undergraduate track only opened for 2026, so early applicants face less competition.",
+    intlPct:"~5% international (new track)", livingCostUSD:700, appFee:"₩80,000 (~$60)",
+    fact:"POSTECH shares its campus with the Pohang Accelerator Lab, a particle accelerator students can actually use for coursework.",
+    supplementPrompt:"POSTECH only just opened to international undergrads. Why apply now, this early?", supplementWords:150,
+    applyUrl:"adm-iu.postech.ac.kr"
+  },
+  {
+    id:"skku", name:"Sungkyunkwan University", city:"Seoul", country:"South Korea", cc:"KR",
+    rank:"Rising fast in Asia rankings · Samsung-backed", selectivity:"Very Selective",
+    tuitionUSD:8500, tuitionNote:"≈10.2–15.6M KRW/yr (≈$7,500–11,500)",
+    scholarship:true, scholarshipNote:"Every international freshman gets at least a 20–25% tuition waiver on entry; STEM majors can reach 100%.",
+    ielts:6.0, toefl:80, duration:"4 years", language:"English or Korean (TOPIK 4+)",
+    deadline:"September (fall round)", intake:"March & September",
+    programs:["Business","Computer Science","Biotechnology","Economics","Global Economics"],
+    highlight:"Samsung's partner university",
+    blurb:"A 600-year-old name (Korea's original Confucian academy) now run with heavy Samsung backing — its business and semiconductor-linked programs feed directly into Samsung's hiring pipeline.",
+    intlPct:"~10% international", livingCostUSD:900, appFee:"₩80,000 (~$60)",
+    fact:"SKKU's Natural Sciences campus in Suwon sits next to Samsung's own semiconductor R&D complex.",
+    supplementPrompt:"How would you use SKKU's ties to Samsung and industry partners?", supplementWords:150,
+    applyUrl:"admission-global.skku.edu"
+  },
+  {
+    id:"hanyang-university", name:"Hanyang University", city:"Seoul", country:"South Korea", cc:"KR",
+    rank:"QS ~160 band · largest international student body in Korea", selectivity:"Selective",
+    tuitionUSD:7500, tuitionNote:"≈7–12M KRW/yr depending on college (≈$5,500–9,000)",
+    scholarship:true, scholarshipNote:"The Hanyang International Excellence Award covers up to 70% tuition for strong applicants; TOPIK-linked awards stack on top.",
+    ielts:6.0, toefl:80, duration:"4 years", language:"English or Korean",
+    deadline:"Rolling, two rounds", intake:"March & September",
+    programs:["Engineering","Architecture","Business","Media Communication","Computer Science"],
+    highlight:"Korea's most international campus",
+    blurb:"An engineering-heavy university in Seoul with the largest international student population of any Korean school, which makes the adjustment less isolating than at more homogeneous campuses.",
+    intlPct:"~15% international", livingCostUSD:850, appFee:"₩80,000 (~$60)",
+    fact:"Hanyang's engineering complex is nicknamed a 'mini industrial city' for how many labs and startup spaces it packs in.",
+    supplementPrompt:"Hanyang has Korea's largest international student body. How will you use that community?", supplementWords:150,
+    applyUrl:"oia.hanyang.ac.kr"
+  },
+  {
+    id:"unist", name:"UNIST", city:"Ulsan", country:"South Korea", cc:"KR",
+    rank:"QS 280–310 band · 100% English instruction", selectivity:"Very Selective",
+    tuitionUSD:0, tuitionNote:"$0 first semester; full or half waiver after, based on GPA",
+    scholarship:true, scholarshipNote:"First semester is fully waived for every admitted student; from year two, GPA 2.7+ keeps the full waiver, GPA 2.0+ keeps a half waiver.",
+    ielts:6.0, toefl:80, duration:"4 years", language:"100% English-taught",
+    deadline:"Rolling, two rounds", intake:"March & September",
+    programs:["Energy & Chemical Engineering","Biomedical Engineering","Computer Science","Urban & Environmental Engineering","Physics"],
+    highlight:"100% English instruction, near-free tuition",
+    blurb:"A young, research-focused university near Ulsan's industrial belt, where every single class — not just a few tracks — is taught in English.",
+    intlPct:"~6% international", livingCostUSD:650, appFee:"₩70,000 (~$50)",
+    fact:"UNIST sits next door to Hyundai's and SK's biggest industrial plants, so internships at both are a short bus ride away.",
+    supplementPrompt:"UNIST teaches everything in English. What draws you to a 100%-English Korean campus?", supplementWords:150,
+    applyUrl:"admu-intl.unist.ac.kr"
+  },
+  {
+    id:"kyung-hee-university", name:"Kyung Hee University", city:"Seoul", country:"South Korea", cc:"KR",
+    rank:"QS #309 (2027), rising", selectivity:"Selective",
+    tuitionUSD:7000, tuitionNote:"≈$5,000–8,000/yr depending on college",
+    scholarship:true, scholarshipNote:"Admission Scholarships A/B/C reward top entrance scores; TOPIK Level 5–6 holders qualify for extra tuition awards (not available to English-track applicants).",
+    ielts:6.0, toefl:80, duration:"4 years", language:"English or Korean (TOPIK 4+)",
+    deadline:"September (fall round)", intake:"March & September",
+    programs:["Hotel & Tourism Management","International Relations","Business","Medicine","Design"],
+    highlight:"Korea's top hospitality & tourism program",
+    blurb:"Built around the idea of 'global cooperation' since 1949, with a campus modeled partly on European palace architecture and the country's best-known hospitality school.",
+    intlPct:"~12% international", livingCostUSD:850, appFee:"₩80,000 (~$60)",
+    fact:"Kyung Hee's main building and rose garden are such a popular drama filming location that signs mark the exact spots.",
+    supplementPrompt:"Why Kyung Hee's program over a similarly ranked Seoul school?", supplementWords:150,
+    applyUrl:"khu.ac.kr"
+  },
+  {
+    id:"ewha-womans-university", name:"Ewha Womans University", city:"Seoul", country:"South Korea", cc:"KR",
+    rank:"QS ~488–504 band · Asia's largest women's university", selectivity:"Selective",
+    tuitionUSD:8000, tuitionNote:"≈9.5–11.8M KRW/yr (≈$7,000–8,700)",
+    scholarship:true, scholarshipNote:"EGPP covers full tuition, housing and a stipend for students from developing countries; TOPIK Level 6 unlocks a separate tuition award.",
+    ielts:5.5, toefl:80, duration:"4 years", language:"English or Korean (TOPIK 3+)",
+    deadline:"September (fall round)", intake:"March & September",
+    programs:["International Studies","Business","Nursing","Communication & Media","Computer Science & Engineering"],
+    highlight:"Asia's largest women's university",
+    blurb:"The world's largest women's university — applicants and both parents must hold non-Korean citizenship — with its own all-female leadership track for every incoming class.",
+    intlPct:"~11% international", livingCostUSD:950, appFee:"₩80,000 (~$60)",
+    fact:"Ewha's glass-walled Campus Complex is sunk below ground level so it never blocks the view of the original 1930s hall behind it.",
+    supplementPrompt:"Ewha is women-only. What draws you to a single-sex university specifically?", supplementWords:150,
+    applyUrl:"admission.ewha.ac.kr"
+  },
+  {
+    id:"sogang-university", name:"Sogang University", city:"Seoul", country:"South Korea", cc:"KR",
+    rank:"QS #494 (2027), up from #558", selectivity:"Selective",
+    tuitionUSD:8000, tuitionNote:"≈7–12.7M KRW/yr (≈$5,500–9,000)",
+    scholarship:true, scholarshipNote:"Global Scholarship I/II renews every semester at full, 2/3, 1/3 or 1/6 tuition based on GPA and credits; admission-based awards add 10–50% in year one.",
+    ielts:6.0, toefl:80, duration:"4 years", language:"English or Korean",
+    deadline:"September (fall round)", intake:"March & September",
+    programs:["Business","Economics","Communication","Computer Science","International Studies"],
+    highlight:"Jesuit-founded, small and personal",
+    blurb:"A small, Jesuit-founded university in central Seoul known for tight class sizes and a business school that punches well above its size in Korean corporate hiring.",
+    intlPct:"~9% international", livingCostUSD:900, appFee:"₩70,000 (~$50)",
+    fact:"Sogang's campus is small enough to cross end to end in under ten minutes — unusual for a Seoul university this well-ranked.",
+    supplementPrompt:"Sogang is small and close-knit. What draws you to that over a bigger campus?", supplementWords:150,
+    applyUrl:"sogang.ac.kr"
+  },
+  {
+    id:"chung-ang-university", name:"Chung-Ang University", city:"Seoul", country:"South Korea", cc:"KR",
+    rank:"QS #432 (2027), up from #479", selectivity:"Selective",
+    tuitionUSD:7500, tuitionNote:"≈$5,500–8,500/yr depending on college",
+    scholarship:true, scholarshipNote:"GPA-tiered waivers run from 20% (GPA 3.2+) up to a full waiver at GPA 4.3+, renewed every semester.",
+    ielts:6.0, toefl:80, duration:"4 years", language:"English or Korean",
+    deadline:"September (fall round)", intake:"March & September",
+    programs:["Film & Media","Business","Pharmacy","Advertising & PR","Computer Science"],
+    highlight:"Korea's top film & media school",
+    blurb:"Home to Korea's most famous film school — alumni shaped much of the country's film and TV industry — plus a business program with strong Seoul-corporate placement.",
+    intlPct:"~10% international", livingCostUSD:900, appFee:"₩80,000 (~$60)",
+    fact:"Chung-Ang's film school runs its own in-house production studio that students can book like working professionals.",
+    supplementPrompt:"What draws you to Chung-Ang's program specifically, beyond its ranking?", supplementWords:150,
+    applyUrl:"cau.ac.kr"
+  },
+  {
+    id:"gist", name:"GIST", city:"Gwangju", country:"South Korea", cc:"KR",
+    rank:"Korea top-10 for research citations per faculty", selectivity:"Extremely Selective",
+    tuitionUSD:0, tuitionNote:"$0 — full scholarship standard for admitted students",
+    scholarship:true, scholarshipNote:"Full tuition, a one-way flight, a monthly stipend and a meal allowance for students keeping a 3.0/4.5 GPA.",
+    ielts:6.5, toefl:80, duration:"4 years", language:"100% English-taught",
+    deadline:"Rolling", intake:"September",
+    programs:["Electrical Engineering","Life Sciences","Materials Science","Environmental Engineering","AI"],
+    highlight:"Tiny, research-heavy, fully funded",
+    blurb:"A small, elite research institute in Gwangju that punches far above its size on research citations — a quieter, more intense alternative to KAIST or POSTECH.",
+    intlPct:"~8% international", livingCostUSD:650, appFee:"₩80,000 (~$60)",
+    fact:"GIST's research equipment, down to the electron microscopes, is open to undergrads from year one, not just grad students.",
+    supplementPrompt:"GIST is small and research-heavy. What research question would you chase here?", supplementWords:150,
+    applyUrl:"gist.ac.kr"
+  },
+  {
+    id:"pusan-national-university", name:"Pusan National University", city:"Busan", country:"South Korea", cc:"KR",
+    rank:"QS 500s band · #1 national university outside Seoul", selectivity:"Moderate",
+    tuitionUSD:3500, tuitionNote:"≈2–4M KRW/semester (≈$3,000–6,000/yr)",
+    scholarship:true, scholarshipNote:"Hosts the largest Global Korea Scholarship (GKS) undergraduate cohort of any Korean university — full tuition, stipend and airfare for GKS winners.",
+    ielts:6.0, toefl:80, duration:"4 years", language:"English or Korean",
+    deadline:"GKS: September prior year · self-funded: rolling", intake:"March & September",
+    programs:["Mechanical Engineering","Nursing","Business","Oceanography","Korean Language & Literature"],
+    highlight:"Biggest GKS scholarship intake in Korea",
+    blurb:"The top national university outside Seoul, in the port city of Busan — a lower cost of living than the capital, and the country's single largest Global Korea Scholarship cohort.",
+    intlPct:"~7% international", livingCostUSD:600, appFee:"₩60,000 (~$45)",
+    fact:"Pusan National's Jangjeon campus backs directly onto Geumjeong Mountain, with a trailhead ten minutes from the main gate.",
+    supplementPrompt:"Why Busan over Seoul for this degree?", supplementWords:150,
+    applyUrl:"pusan.ac.kr"
+  },
+  {
+    id:"konkuk-university", name:"Konkuk University", city:"Seoul", country:"South Korea", cc:"KR",
+    rank:"QS 600–700s band", selectivity:"Moderate",
+    tuitionUSD:6500, tuitionNote:"≈$5,000–7,500/yr",
+    scholarship:true, scholarshipNote:"First-semester tuition waivers scale with TOPIK level: 40% with no TOPIK, up to 70% at TOPIK 5–6.",
+    ielts:5.5, toefl:71, duration:"4 years", language:"English or Korean",
+    deadline:"September (fall round)", intake:"March & September",
+    programs:["Veterinary Medicine","Business","Architecture","Media Communication","Biotechnology"],
+    highlight:"Korea's top veterinary program",
+    blurb:"Home to one of Korea's few veterinary medicine programs, on a lakeside campus in eastern Seoul that doubles as a popular weekend walking spot for the whole neighborhood.",
+    intlPct:"~9% international", livingCostUSD:800, appFee:"₩70,000 (~$50)",
+    fact:"Konkuk's campus lake, Ilgamho, is stocked and maintained by the university's own veterinary and life-sciences students.",
+    supplementPrompt:"What draws you to Konkuk's program over a similarly ranked Seoul school?", supplementWords:150,
+    applyUrl:"konkuk.ac.kr"
+  },
+  {
+    id:"dongguk-university", name:"Dongguk University", city:"Seoul", country:"South Korea", cc:"KR",
+    rank:"QS ~481 band · Korea's top Buddhist-founded university", selectivity:"Moderate",
+    tuitionUSD:7000, tuitionNote:"≈6.9–9.1M KRW/yr (≈$5,000–6,700)",
+    scholarship:true, scholarshipNote:"TOEFL/IELTS/TOPIK-linked awards cut tuition up to 50%; select engineering and science majors can reach a full 4-semester waiver.",
+    ielts:5.5, toefl:80, duration:"4 years", language:"English or Korean",
+    deadline:"September (fall round)", intake:"March & September",
+    programs:["Film Studies","Buddhist Studies","Business","Police Administration","Computer Science"],
+    highlight:"Korea's top film-adjacent, Buddhist-founded school",
+    blurb:"Founded by the Jogye Order of Korean Buddhism, with a campus built into the hillside below Namsan — its film program has produced some of Korea's best-known directors.",
+    intlPct:"~8% international", livingCostUSD:800, appFee:"₩70,000 (~$50)",
+    fact:"Dongguk's hillside campus includes a working Buddhist temple that's open to students of any faith or none.",
+    supplementPrompt:"What draws you to Dongguk's program specifically?", supplementWords:150,
+    applyUrl:"dongguk.edu"
+  },
+  {
+    id:"kookmin-university", name:"Kookmin University", city:"Seoul", country:"South Korea", cc:"KR",
+    rank:"QS 700s–800s band · design & automotive engineering hub", selectivity:"Moderate",
+    tuitionUSD:6500, tuitionNote:"≈$5,000–7,500/yr",
+    scholarship:true, scholarshipNote:"TOPIK-based awards of ₩1–2 million per semester for Level 4–6; GPA-based renewal awards for continuing students.",
+    ielts:6.0, toefl:72, duration:"4 years", language:"English or Korean (TOPIK required for most majors)",
+    deadline:"September (fall round)", intake:"March & September",
+    programs:["Automotive Engineering","Industrial Design","Business","Forestry & Environment","Computer Science"],
+    highlight:"Korea's top automotive design program",
+    blurb:"A design-and-engineering-focused university in northern Seoul whose automotive design program feeds directly into Hyundai and Kia's design studios.",
+    intlPct:"~7% international", livingCostUSD:800, appFee:"₩70,000 (~$50)",
+    fact:"Kookmin's Automotive Design department runs a full-scale clay modeling studio most undergrad programs never get access to.",
+    supplementPrompt:"What draws you to Kookmin's program over a bigger-name Seoul school?", supplementWords:150,
+    applyUrl:"english.kookmin.ac.kr"
+  },
+  {
+    id:"ajou-university", name:"Ajou University", city:"Suwon", country:"South Korea", cc:"KR",
+    rank:"Asia-ranked · strong engineering reputation", selectivity:"Moderate",
+    tuitionUSD:6000, tuitionNote:"≈$4,500–7,000/yr",
+    scholarship:true, scholarshipNote:"The Ajou Global Scholarship runs four tiers for new students — up to 100% tuition for TOPIK 6 + IELTS 8.0, down to 30% at TOPIK 3 + IELTS 5.5.",
+    ielts:5.5, toefl:80, duration:"4 years", language:"English or Korean (TOPIK 3+)",
+    deadline:"September (fall round)", intake:"March & September",
+    programs:["Engineering","Pharmacy","Business","Software Convergence","Medicine"],
+    highlight:"Clearest tiered scholarship ladder on this list",
+    blurb:"A mid-sized university in Suwon, a short train ride from Seoul, with one of the most clearly published scholarship ladders of any Korean school — students know exactly what score gets what discount.",
+    intlPct:"~8% international", livingCostUSD:700, appFee:"₩70,000 (~$50)",
+    fact:"Ajou's engineering college partners directly with Samsung's nearby Suwon campus for student internships.",
+    supplementPrompt:"Which tier of Ajou's scholarship ladder are you aiming for, and why?", supplementWords:150,
+    applyUrl:"ajou.ac.kr"
+  },
+  {
+    id:"inha-university", name:"Inha University", city:"Incheon", country:"South Korea", cc:"KR",
+    rank:"Asia-ranked · founded with US aid in 1954", selectivity:"Moderate",
+    tuitionUSD:6000, tuitionNote:"≈$4,500–7,000/yr",
+    scholarship:true, scholarshipNote:"Admission scholarships scale with TOPIK and English scores; students completing 2+ semesters at Inha's Korean Language Center get the entrance fee waived.",
+    ielts:5.5, toefl:80, duration:"4 years", language:"English or Korean",
+    deadline:"September (fall round)", intake:"March & September",
+    programs:["Naval Architecture & Ocean Engineering","Business","Logistics","Computer Science","Chemical Engineering"],
+    highlight:"Korea's top logistics & port-city engineering school",
+    blurb:"Founded in 1954 with US aid, in the port city of Incheon next to Korea's main international airport — its logistics and ocean-engineering programs lean into that location directly.",
+    intlPct:"~9% international", livingCostUSD:650, appFee:"₩70,000 (~$50)",
+    fact:"Inha's name combines 'Incheon' and 'Hawaii' — the university was founded partly with funding from Korean-American communities in Hawaii.",
+    supplementPrompt:"Why Inha's program, and does Incheon's port-city location matter to you?", supplementWords:150,
+    applyUrl:"inha.ac.kr"
+  },
+  {
+    id:"hongik-university", name:"Hongik University", city:"Seoul", country:"South Korea", cc:"KR",
+    rank:"Korea's top art & design school", selectivity:"Selective (portfolio-based for design)",
+    tuitionUSD:7500, tuitionNote:"≈$5,500–9,000/yr, higher for studio-based majors",
+    scholarship:true, scholarshipNote:"Merit and TOPIK-linked tuition waivers exist, but design majors are judged mainly on portfolio, so funding is less automatic than at research universities.",
+    ielts:5.5, toefl:80, duration:"4 years", language:"English or Korean",
+    deadline:"September (fall round), portfolio deadlines earlier", intake:"March & September",
+    programs:["Visual Communication Design","Architecture","Fine Arts","Industrial Design","Film"],
+    highlight:"Korea's top art & design school",
+    blurb:"Korea's top art and design school, and the namesake of the Hongdae neighborhood that grew up around it — expect a portfolio review, not just grades, for design and arts majors.",
+    intlPct:"~10% international", livingCostUSD:850, appFee:"₩70,000 (~$50)",
+    fact:"Hongik's design graduates are a major reason Hongdae became Seoul's biggest street-art and indie-music neighborhood.",
+    supplementPrompt:"Design and arts majors need a portfolio. What would be the centerpiece of yours?", supplementWords:150,
+    applyUrl:"hongik.ac.kr"
+  }
+];
+var RESOURCES = [
+  {id:"ielts", title:"IELTS or TOPIK — which one first?", tag:"Course coming soon", body:"A week-by-week roadmap for hitting the 5.5–6.5 IELTS band these 20 schools ask for, or TOPIK 3–4 if you'd rather apply to a Korean-taught track."},
+  {id:"ps", title:"Personal statements admissions officers remember", tag:"Course coming soon", body:"How to turn one relevant story into a shared statement plus a sharp, school-specific supplement, without sounding copy-pasted."},
+  {id:"visa", title:"The D-2 student visa, step by step", tag:"Guide draft", body:"What Kazakh, Uzbek and Kyrgyz passport holders need for Korea's D-2 visa and the Alien Registration Card, once you have an admission letter."},
+  {id:"scholar", title:"GKS, TOPIK awards, and automatic waivers — explained", tag:"Guide draft", body:"The difference between the government-funded Global Korea Scholarship, TOPIK-linked tuition waivers, and GPA-based renewal awards you can lose."}
+];
+
+var STATUS_META = {
+  draft:{label:"Draft", color:"muted", step:0},
+  submitted:{label:"Submitted", color:"info", step:1},
+  review:{label:"Under Review", color:"warn", step:2},
+  admitted:{label:"Admitted", color:"good", step:3},
+  waitlisted:{label:"Waitlisted", color:"warn", step:3},
+  declined:{label:"Not This Time", color:"bad", step:3}
+};
+var STEP_LABELS = ["Draft","Submitted","Under Review","Decision"];
+
+/* ===================== STATE ===================== */
+var LS_PROFILE = "wehelp_profile_v1", LS_SHORTLIST = "wehelp_shortlist_v1", LS_APPS = "wehelp_apps_v1";
+
+function uid(){ return "a" + Math.random().toString(36).slice(2,9); }
+
+function safeGet(key, fallback){
+  try{ var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch(e){ return fallback; }
+}
+function safeSet(key, val){
+  try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+}
+
+var ACTIVITY_CATEGORIES = ["Academic club","Athletics","Community service","Family responsibilities","Internship / work","Music or art","Olympiad / competition","Research","Student government","Other"];
+
+var defaultProfile = {
+  firstName:"Aruzhan", lastName:"Tulegenova", email:"aruzhan.t@example.com", phone:"+7 701 234 5678",
+  country:"Kazakhstan", city:"Almaty", school:"NIS Physics & Math, Almaty", gradYear:"2026",
+  gpa:"3.8", gpaScale:"4.0", ielts:"7.0", sat:"1420",
+  statement:"I want to study computer science somewhere I can also keep competing in math olympiads. Draft — needs a stronger opening line.",
+  documents:{ passport:{name:"passport_scan.pdf"}, transcript:{name:"transcript_10_11.pdf"}, recommendation:null, photo:{name:"id_photo.jpg"} },
+  activities:[
+    {id:"act1", category:"Olympiad / competition", role:"Team captain", org:"Republican Math Olympiad", hours:"6", weeks:"20", grades:"10, 11", description:"Placed 2nd nationally in 2025; now coach three juniors weekly."},
+    {id:"act2", category:"Research", role:"Student researcher", org:"NIS Almaty robotics lab", hours:"4", weeks:"30", grades:"11", description:"Built a line-following robot for a school open-day demo."},
+    {id:"act3", category:"Community service", role:"Volunteer tutor", org:"Local community center", hours:"3", weeks:"15", grades:"10, 11", description:"Tutor younger students in algebra every weekend."}
+  ],
+  recommenders:[
+    {id:"rec1", name:"Madina Serikova", role:"Math teacher", email:"m.serikova@nis-almaty.example", status:"submitted"},
+    {id:"rec2", name:"Yerlan Abenov", role:"School counselor", email:"y.abenov@nis-almaty.example", status:"invited"}
+  ]
+};
+
+var state = {
+  profile: safeGet(LS_PROFILE, defaultProfile),
+  shortlist: safeGet(LS_SHORTLIST, ["seoul-national-university","korea-university","kaist","yonsei-university","hanyang-university"]),
+  apps: safeGet(LS_APPS, null),
+  compare: [],
+  filters: { q:"", countries:[], maxTuition:40000, scholarshipOnly:false, selectivity:"" },
+  applyStep: 0,
+  menuOpen:false
+};
+
+if(!state.apps){
+  var now = Date.now(), day = 86400000;
+  state.apps = [
+    {id:uid(), uniId:"seoul-national-university", status:"admitted", program:"Computer Science", createdAt:now-40*day, updatedAt:now-5*day,
+      supplementAnswer:"SNU's systems lab is doing exactly the distributed-systems research I want to build a career on.",
+      history:[["Draft",now-40*day],["Submitted",now-33*day],["Under Review",now-20*day],["Admitted",now-5*day]]},
+    {id:uid(), uniId:"korea-university", status:"review", program:"Computer Science", createdAt:now-18*day, updatedAt:now-3*day,
+      history:[["Draft",now-18*day],["Submitted",now-12*day],["Under Review",now-3*day]]},
+    {id:uid(), uniId:"kaist", status:"submitted", program:"Computer Science", createdAt:now-6*day, updatedAt:now-6*day,
+      supplementAnswer:"I built a line-following robot in high school and want to push into reinforcement learning next.",
+      history:[["Draft",now-6*day],["Submitted",now-6*day]]}
+  ];
+  safeSet(LS_APPS, state.apps);
+}
+
+function saveProfile(){ safeSet(LS_PROFILE, state.profile); toast("Profile saved"); }
+function saveShortlist(){ safeSet(LS_SHORTLIST, state.shortlist); }
+function saveApps(){ safeSet(LS_APPS, state.apps); }
+
+var toastTimer = null;
+function toast(msg){
+  var el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 1800);
+}
+
+/* ===================== HELPERS ===================== */
+function esc(s){
+  return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+function uniById(id){ for(var i=0;i<UNIS.length;i++){ if(UNIS[i].id===id) return UNIS[i]; } return null; }
+function fmtUSD(n){ return n===0 ? "$0" : "$"+n.toLocaleString("en-US"); }
+function fmtDate(ts){ return new Date(ts).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}); }
+function daysAgo(ts){ var d=Math.floor((Date.now()-ts)/86400000); return d<=0?"today":(d+"d ago"); }
+function profileCompleteness(p){
+  var fields = [p.firstName,p.lastName,p.email,p.phone,p.country,p.city,p.school,p.gradYear,p.gpa,p.ielts,p.statement];
+  var filled = fields.filter(function(v){ return v && String(v).trim().length>0; }).length;
+  var docs = p.documents || {};
+  var docFilled = ["passport","transcript","recommendation","photo"].filter(function(k){ return docs[k]; }).length;
+  var activityScore = (p.activities||[]).length>0 ? 1 : 0;
+  var recScore = (p.recommenders||[]).length>0 ? 1 : 0;
+  var total = fields.length + 4 + 2;
+  return Math.round(((filled+docFilled+activityScore+recScore)/total)*100);
+}
+/* Common-App-style per-college checklist: shared profile pieces + this school's own supplement. */
+function checklistFor(app, uni){
+  var p = state.profile;
+  var docs = p.documents || {};
+  var items = [
+    {label:"Common Profile", done: !!(p.firstName && p.lastName && p.email && p.gpa)},
+    {label:"Activities", done: (p.activities||[]).length>0},
+    {label:"Test scores", done: !!(p.ielts && parseFloat(p.ielts)>0)},
+    {label:"Documents", done: !!(docs.passport && docs.transcript) },
+    {label:"Personal essay", done: !!(p.statement && p.statement.trim().length>40)},
+    {label:"Recommender invited", done: (p.recommenders||[]).length>0},
+    {label:uni.name.length>22 ? "School supplement" : uni.name+" supplement", done: !!(app && app.supplementAnswer && app.supplementAnswer.trim().length>20)}
+  ];
+  var doneCount = items.filter(function(i){ return i.done; }).length;
+  return {items:items, doneCount:doneCount, total:items.length, pct:Math.round(doneCount/items.length*100)};
+}
+function pillHtml(label, color){
+  return '<span class="pill" style="background:var(--'+color+'-soft);color:var(--'+color+')">'+esc(label)+'</span>';
+}
+function stampHtml(u){ return '<span class="stamp">'+esc(u.cc)+' · '+esc(u.country)+'</span>'; }
+
+/* ===================== ROUTER ===================== */
+function parseHash(){
+  var h = (location.hash||"").replace(/^#/,"");
+  if(!h) return {view:"home"};
+  if(h.indexOf("uni-")===0) return {view:"uni", id:h.slice(4)};
+  if(h.indexOf("apply-")===0) return {view:"apply", id:h.slice(6)};
+  if(["home","dashboard","explore","compare","profile","applications","resources"].indexOf(h)>-1) return {view:h};
+  return {view:"home"};
+}
+function go(hash){ location.hash = "#"+hash; }
+
+function setSidebar(open){
+  state.sidebarOpen = open;
+  document.body.classList.toggle("sidebar-open", open);
+}
+setSidebar(window.innerWidth >= 760);
+
+document.getElementById("sidebarFloatBtn").addEventListener("click", function(){ setSidebar(true); });
+document.getElementById("sidebarCloseBtn").addEventListener("click", function(){ setSidebar(false); });
+document.getElementById("sidebarBackdrop").addEventListener("click", function(){ setSidebar(false); });
+
+window.addEventListener("hashchange", render);
+document.addEventListener("click", function(e){
+  var t = e.target.closest("[data-go]");
+  if(t){
+    go(t.getAttribute("data-go"));
+    if(window.innerWidth < 760) setSidebar(false);
+  }
+});
+
+/* ===================== RENDER: HOME ===================== */
+function computeTodos(){
+  var todos = [];
+  var pf = state.profile;
+  var pct = profileCompleteness(pf);
+  if(pct < 100) todos.push({label:"Finish your profile", sub:(100-pct)+"% left to go", href:"profile"});
+  state.apps.forEach(function(a){
+    if(a.status==="admitted" || a.status==="declined" || a.status==="waitlisted") return;
+    var u = uniById(a.uniId); if(!u) return;
+    var cl = checklistFor(a, u);
+    cl.items.forEach(function(it){
+      if(!it.done) todos.push({label:it.label+" — "+u.name, sub:"Deadline "+u.deadline.split(",")[0], href:"profile"});
+    });
+  });
+  return todos.slice(0,4);
+}
+
+function greeting(){
+  var h = new Date().getHours();
+  if(h<5) return "Still up";
+  if(h<12) return "Good morning";
+  if(h<18) return "Good afternoon";
+  return "Good evening";
+}
+
+function renderHome(){
+  var cities = {}; UNIS.forEach(function(u){ cities[u.city]=1; });
+  var cityCount = Object.keys(cities).length;
+  var scholarCount = UNIS.filter(function(u){ return u.scholarship; }).length;
+  var featured = UNIS.slice(0,4);
+  var todos = computeTodos();
+
+  return '' +
+  '<section class="hero">' +
+    '<div>' +
+      '<div class="eyebrow">'+greeting()+', '+esc(state.profile.firstName||"there")+'</div>' +
+      '<h1>Build your profile once.<br><em>Apply</em> everywhere that fits.</h1>' +
+      '<p class="lede">WeHelp is the Common App for Central Asian students applying to Korea — one academic profile, a researched shortlist of '+UNIS.length+' Korean universities across '+cityCount+' cities, and an agency team behind the screen when you get stuck.</p>' +
+      '<div class="hero-actions">' +
+        '<button class="btn btn-primary" data-go="profile">Start my profile</button>' +
+        '<button class="btn btn-ghost" data-go="explore">Explore universities</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="card todo-card">' +
+      '<div class="todo-head"><span class="eyebrow">Up next</span>' + (state.apps.length ? '<span class="hint">'+state.apps.length+' college'+(state.apps.length===1?"":"s")+' in progress</span>' : '') + '</div>' +
+      (todos.length ?
+        '<ul class="todo-list">' + todos.map(function(t){
+          return '<li><button data-go="'+t.href+'"><span>'+esc(t.label)+'</span><span class="hint">'+esc(t.sub)+'</span></button></li>';
+        }).join("") + '</ul>'
+      : (state.apps.length ? '<p class="hint" style="padding:4px 2px">You\'re caught up — nothing outstanding right now.</p>' : '<p class="hint" style="padding:4px 2px">Build your profile, then add your first college from Explore.</p>')) +
+    '</div>' +
+  '</section>' +
+
+  '<section class="section">' +
+    '<div class="stat-row">' +
+      '<div class="stat"><div class="n">'+UNIS.length+'</div><div class="l">universities, pre-researched</div></div>' +
+      '<div class="stat"><div class="n">'+cityCount+'</div><div class="l">cities covered</div></div>' +
+      '<div class="stat"><div class="n">'+scholarCount+'</div><div class="l">with real scholarship routes</div></div>' +
+      '<div class="stat"><div class="n">1</div><div class="l">profile, reused every time</div></div>' +
+    '</div>' +
+  '</section>' +
+
+  '<section class="section">' +
+    '<div class="section-head"><div><div class="eyebrow">How it works</div><h2 style="margin:4px 0 0;font-size:24px">From blank page to submitted application</h2></div></div>' +
+    '<div class="steps">' +
+      '<div class="card step"><div class="k">01</div><h3>Build your profile</h3><p>Grades, test scores, documents and your personal statement — entered once, reused for every school.</p></div>' +
+      '<div class="card step"><div class="k">02</div><h3>Explore & shortlist</h3><p>Filter '+UNIS.length+' real universities by city, tuition and scholarship availability.</p></div>' +
+      '<div class="card step"><div class="k">03</div><h3>Apply with one flow</h3><p>Each school reuses your profile — you only answer what is actually different.</p></div>' +
+      '<div class="card step"><div class="k">04</div><h3>Track every decision</h3><p>One dashboard shows every application\'s stage, from draft to admitted.</p></div>' +
+    '</div>' +
+  '</section>' +
+
+  '<section class="section">' +
+    '<div class="section-head"><div><div class="eyebrow">Featured</div><h2 style="margin:4px 0 0;font-size:24px">A taste of the shortlist</h2></div><button class="btn btn-ghost btn-sm" data-go="explore">See all '+UNIS.length+'</button></div>' +
+    '<div class="grid-cards">' + featured.map(uniCardHtml).join("") + '</div>' +
+  '</section>' +
+
+  '<section class="section">' +
+    '<div class="card advisor">' +
+      '<div>' +
+        '<div class="eyebrow">Behind the platform</div>' +
+        '<h2 style="margin:6px 0 10px;font-size:22px">A human advisor, not just a form</h2>' +
+        '<p style="color:var(--muted);margin:0 0 14px;max-width:48ch">WeHelp is built by an agency team, not just software — book a free call and we\'ll sanity-check your shortlist before you file anything.</p>' +
+        '<button class="btn btn-primary" id="bookCallBtn">Book a free consultation</button>' +
+      '</div>' +
+      '<div>' +
+        '<div class="hint" style="margin-bottom:6px">Placeholder contact — swap for your real handles</div>' +
+        '<div class="contact-chip"><span>@wehelp_admissions</span><button class="copybtn" data-copy="@wehelp_admissions">Copy</button></div>' +
+        '<div class="contact-chip"><span>+7 700 000 00 00</span><button class="copybtn" data-copy="+7 700 000 00 00">Copy</button></div>' +
+      '</div>' +
+    '</div>' +
+  '</section>';
+}
+
+function uniCardHtml(u){
+  var starred = state.shortlist.indexOf(u.id) > -1;
+  return '<div class="card uni-card" data-go="uni-'+u.id+'">' +
+    '<div class="uni-top">' +
+      '<div><div class="uni-name">'+esc(u.name)+'</div><div class="uni-loc">'+esc(u.city)+', '+esc(u.country)+'</div></div>' +
+      '<button class="star-btn'+(starred?' on':'')+'" data-star="'+u.id+'" title="Shortlist" aria-label="Toggle shortlist">★</button>' +
+    '</div>' +
+    '<div class="taglist"><span class="tag">'+esc(u.highlight)+'</span>'+(u.scholarship?pillHtml("Scholarship","good"):'')+'</div>' +
+    '<div class="uni-stats">' +
+      '<div>Rank<b>'+esc(u.rank.split(" · ")[0])+'</b></div>' +
+      '<div>Tuition/yr<b>'+fmtUSD(u.tuitionUSD)+'</b></div>' +
+      '<div>IELTS<b>'+u.ielts.toFixed(1)+'</b></div>' +
+      '<div>Selectivity<b style="font-family:inherit;font-size:12px">'+esc(u.selectivity)+'</b></div>' +
+    '</div>' +
+    '<div class="uni-foot">'+stampHtml(u)+'<span class="hint">Deadline: '+esc(u.deadline.split(",")[0])+'</span></div>' +
+  '</div>';
+}
+
+/* ===================== RENDER: EXPLORE ===================== */
+function renderExplore(){
+  var allCities = []; UNIS.forEach(function(u){ if(allCities.indexOf(u.city)===-1) allCities.push(u.city); });
+  var f = state.filters;
+  var list = UNIS.filter(function(u){
+    if(f.q && (u.name+" "+u.city+" "+u.country+" "+u.programs.join(" ")).toLowerCase().indexOf(f.q.toLowerCase())===-1) return false;
+    if(f.countries.length && f.countries.indexOf(u.city)===-1) return false;
+    if(u.tuitionUSD > f.maxTuition) return false;
+    if(f.scholarshipOnly && !u.scholarship) return false;
+    if(f.selectivity && u.selectivity !== f.selectivity) return false;
+    return true;
+  });
+
+  return '' +
+  '<section class="section" style="padding-top:28px">' +
+    '<div class="section-head"><div><div class="eyebrow">Explore</div><h2 style="margin:4px 0 0;font-size:26px">'+UNIS.length+' universities, one filter bar</h2></div></div>' +
+    '<div class="card filters">' +
+      '<div class="field" style="min-width:220px;flex:2"><label for="fq">Search</label><input id="fq" type="text" placeholder="Name, city, program…" value="'+esc(f.q)+'"></div>' +
+      '<div class="field" style="min-width:160px"><label for="fsel">Selectivity</label>' +
+        '<select id="fsel"><option value="">Any</option>' +
+        ["Extremely Selective","Very Selective","Selective","Moderate"].map(function(s){ return '<option'+(f.selectivity===s?' selected':'')+'>'+s+'</option>'; }).join("") +
+        '</select></div>' +
+      '<div class="field" style="min-width:200px"><label for="ftu">Max tuition/yr: <span class="mono">'+fmtUSD(f.maxTuition)+'</span></label><input id="ftu" type="range" min="0" max="40000" step="500" value="'+f.maxTuition+'"></div>' +
+      '<label style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;padding-bottom:9px"><input id="fsch" type="checkbox"'+(f.scholarshipOnly?' checked':'')+'> Scholarship route only</label>' +
+    '</div>' +
+    '<div class="chip-row" style="margin-bottom:18px">' +
+      allCities.map(function(c){ return '<button class="chip country-chip'+(f.countries.indexOf(c)>-1?' on':'')+'" data-country="'+esc(c)+'">'+esc(c)+'</button>'; }).join("") +
+    '</div>' +
+    (list.length ? '<div class="grid-cards">'+list.map(uniCardHtml).join("")+'</div>' : '<div class="card empty">No universities match those filters. Try widening the tuition range.</div>') +
+  '</section>';
+}
+
+/* ===================== RENDER: UNI DETAIL ===================== */
+var detailTab = "overview";
+function renderUniDetail(id){
+  var u = uniById(id);
+  if(!u) return '<section class="section"><p>University not found.</p><button class="btn btn-ghost" data-go="explore">Back to explore</button></section>';
+  var starred = state.shortlist.indexOf(u.id) > -1;
+  var tabs = [["overview","Overview"],["admissions","Admissions"],["cost","Cost & Scholarships"],["programs","Programs & Deadlines"]];
+
+  var body = "";
+  if(detailTab==="overview"){
+    body = '<p style="max-width:62ch;color:var(--muted)">'+esc(u.blurb)+'</p>' +
+      '<div class="kv" style="margin-top:16px">' +
+        '<div class="kv-item"><div class="l">World rank</div><div class="v" style="font-size:13px">'+esc(u.rank)+'</div></div>' +
+        '<div class="kv-item"><div class="l">Selectivity</div><div class="v" style="font-size:13px">'+esc(u.selectivity)+'</div></div>' +
+        '<div class="kv-item"><div class="l">Language</div><div class="v" style="font-size:13px">'+esc(u.language)+'</div></div>' +
+        '<div class="kv-item"><div class="l">Degree length</div><div class="v" style="font-size:13px">'+esc(u.duration)+'</div></div>' +
+        '<div class="kv-item"><div class="l">Student body</div><div class="v" style="font-size:13px">'+esc(u.intlPct)+'</div></div>' +
+        '<div class="kv-item"><div class="l">Est. living cost</div><div class="v">~'+fmtUSD(u.livingCostUSD)+'/mo</div></div>' +
+        '<div class="kv-item"><div class="l">Application fee</div><div class="v" style="font-size:13px">'+esc(u.appFee)+'</div></div>' +
+        '<div class="kv-item"><div class="l">Highlight</div><div class="v" style="font-size:13px">'+esc(u.highlight)+'</div></div>' +
+      '</div>' +
+      '<div class="fact-box"><span class="fact-k">Campus detail</span>'+esc(u.fact)+'</div>';
+  } else if(detailTab==="admissions"){
+    body = '<div class="kv">' +
+      '<div class="kv-item"><div class="l">IELTS minimum</div><div class="v">'+u.ielts.toFixed(1)+'</div></div>' +
+      '<div class="kv-item"><div class="l">TOEFL iBT minimum</div><div class="v">'+u.toefl+'</div></div>' +
+      '<div class="kv-item"><div class="l">Selectivity</div><div class="v" style="font-size:14px">'+esc(u.selectivity)+'</div></div>' +
+      '<div class="kv-item"><div class="l">Next intake</div><div class="v" style="font-size:14px">'+esc(u.intake)+'</div></div>' +
+    '</div>' +
+    '<a class="official-link" href="https://'+esc(u.applyUrl)+'" target="_blank" rel="noopener">Official admissions site ↗<span>'+esc(u.applyUrl)+'</span></a>' +
+    '<p class="hint" style="margin-top:14px">Figures compiled from public sources — some faculties set their own thresholds. Confirm before advising a student.</p>';
+  } else if(detailTab==="cost"){
+    body = '<div class="kv">' +
+      '<div class="kv-item" style="grid-column:1/-1"><div class="l">Tuition</div><div class="v" style="font-size:16px">'+esc(u.tuitionNote)+'</div></div>' +
+    '</div>' +
+    '<div class="divider"></div>' +
+    (u.scholarship ? pillHtml("Scholarship route available","good") : pillHtml("Limited scholarship route","warn")) +
+    '<p style="margin-top:10px;color:var(--muted);max-width:60ch">'+esc(u.scholarshipNote)+'</p>';
+  } else {
+    body = '<div class="taglist" style="margin-bottom:16px">' + u.programs.map(function(p){ return '<span class="tag">'+esc(p)+'</span>'; }).join("") + '</div>' +
+    '<div class="kv">' +
+      '<div class="kv-item"><div class="l">Application deadline</div><div class="v" style="font-size:14px">'+esc(u.deadline)+'</div></div>' +
+      '<div class="kv-item"><div class="l">Intake</div><div class="v" style="font-size:14px">'+esc(u.intake)+'</div></div>' +
+    '</div>';
+  }
+
+  var existingApp = state.apps.find(function(a){ return a.uniId===u.id; });
+
+  return '<section class="section" style="padding-top:24px">' +
+    '<button class="btn btn-ghost btn-sm" data-go="explore" style="margin-bottom:16px">&larr; All universities</button>' +
+    '<div class="detail-head">' +
+      '<div><div class="eyebrow">'+stampHtml(u)+'</div><h1 style="font-size:28px;margin:8px 0 4px">'+esc(u.name)+'</h1><div class="hint">'+esc(u.city)+', '+esc(u.country)+'</div></div>' +
+      '<div style="display:flex;gap:8px;align-items:center">' +
+        '<button class="star-btn'+(starred?' on':'')+'" data-star="'+u.id+'" title="Shortlist" aria-label="Toggle shortlist" style="width:40px;height:40px">★</button>' +
+        (existingApp ? '<button class="btn btn-ghost" data-go="applications">View application</button>' : '<button class="btn btn-primary" data-go="apply-'+u.id+'">Start application</button>') +
+      '</div>' +
+    '</div>' +
+    '<div class="tabs">' + tabs.map(function(t){ return '<button class="tab'+(detailTab===t[0]?' active':'')+'" data-tab="'+t[0]+'">'+t[1]+'</button>'; }).join("") + '</div>' +
+    '<div class="card" style="padding:22px">' + body + '</div>' +
+  '</section>';
+}
+
+/* ===================== RENDER: COMPARE ===================== */
+function renderCompare(){
+  var picked = state.compare.map(uniById).filter(Boolean);
+  var rows = [
+    ["Country", function(u){ return u.country; }],
+    ["World rank", function(u){ return u.rank; }],
+    ["Selectivity", function(u){ return u.selectivity; }],
+    ["Tuition / yr", function(u){ return fmtUSD(u.tuitionUSD); }],
+    ["Scholarship route", function(u){ return u.scholarship ? "Yes" : "Limited"; }],
+    ["IELTS min", function(u){ return u.ielts.toFixed(1); }],
+    ["TOEFL min", function(u){ return u.toefl; }],
+    ["Degree length", function(u){ return u.duration; }],
+    ["Deadline", function(u){ return u.deadline; }],
+    ["Language", function(u){ return u.language; }]
+  ];
+
+  var slots = "";
+  for(var i=0;i<3;i++){
+    if(picked[i]){
+      slots += '<div class="card" style="padding:12px 14px;flex:1;min-width:160px;display:flex;justify-content:space-between;align-items:center;gap:8px">' +
+        '<span style="font-weight:700;font-size:13.5px">'+esc(picked[i].name)+'</span>' +
+        '<button class="btn btn-ghost btn-sm" data-uncompare="'+picked[i].id+'">Remove</button></div>';
+    } else {
+      slots += '<div class="cmp-slot">Pick a university from the shortlist below</div>';
+    }
+  }
+
+  var shortlistUnis = state.shortlist.map(uniById).filter(Boolean);
+
+  var table = "";
+  if(picked.length){
+    table = '<div class="card cmp-scroll" style="padding:4px 18px"><table class="cmp-table"><thead><tr><th>Criteria</th>' +
+      picked.map(function(u){ return '<th>'+esc(u.name)+'</th>'; }).join("") + '</tr></thead><tbody>' +
+      rows.map(function(r){ return '<tr><td class="k">'+r[0]+'</td>' + picked.map(function(u){ return '<td class="mono-cell">'+esc(r[1](u))+'</td>'; }).join("") + '</tr>'; }).join("") +
+      '</tbody></table></div>';
+  } else {
+    table = '<div class="card empty">Pick up to 3 universities to compare side by side.</div>';
+  }
+
+  return '<section class="section" style="padding-top:28px">' +
+    '<div class="section-head"><div><div class="eyebrow">Compare</div><h2 style="margin:4px 0 0;font-size:26px">Up to 3 universities, side by side</h2></div></div>' +
+    '<div class="cmp-pick">'+slots+'</div>' +
+    table +
+    '<div class="divider"></div>' +
+    '<h3 style="font-size:15px;margin-bottom:10px">Your shortlist</h3>' +
+    (shortlistUnis.length ?
+      '<div class="chip-row">' + shortlistUnis.map(function(u){
+        var on = state.compare.indexOf(u.id)>-1;
+        return '<button class="chip'+(on?' on':'')+'" data-compare-toggle="'+u.id+'">'+esc(u.name)+'</button>';
+      }).join("") + '</div>'
+      : '<p class="hint">Star universities on the Explore page to add them here.</p>') +
+  '</section>';
+}
+
+/* ===================== RENDER: PROFILE ===================== */
+function renderProfile(){
+  var p = state.profile;
+  var pct = profileCompleteness(p);
+  var docs = [
+    ["passport","Passport scan","Required for every application"],
+    ["transcript","Academic transcript","Grades 10–11 or equivalent"],
+    ["recommendation","Recommendation letter","One teacher or counselor letter"],
+    ["photo","ID photo","Passport-style photo"]
+  ];
+
+  return '<section class="section" style="padding-top:28px">' +
+    '<div class="eyebrow">My Profile</div><h2 style="margin:4px 0 18px;font-size:26px">One profile, every application</h2>' +
+    '<div class="card profile-head">' +
+      '<div class="progress-ring" style="--pct:'+pct+'"><div class="hole">'+pct+'%</div></div>' +
+      '<div><div style="font-weight:700;font-size:15px">'+(pct===100?"Ready to apply everywhere":"Keep going")+'</div>' +
+      '<div class="hint">Fields and documents below feed every application you start.</div></div>' +
+    '</div>' +
+
+    '<form id="profileForm">' +
+      '<div class="card" style="padding:20px;margin-bottom:16px">' +
+        '<h3 style="margin:0 0 14px;font-size:15px">Personal details</h3>' +
+        '<div class="form-grid">' +
+          field("firstName","First name",p.firstName) + field("lastName","Last name",p.lastName) +
+          field("email","Email","" + p.email, "email") + field("phone","Phone",p.phone) +
+          field("country","Home country",p.country) + field("city","City",p.city) +
+        '</div>' +
+      '</div>' +
+
+      '<div class="card" style="padding:20px;margin-bottom:16px">' +
+        '<h3 style="margin:0 0 14px;font-size:15px">Academics & test scores</h3>' +
+        '<div class="form-grid">' +
+          field("school","Current school",p.school) + field("gradYear","Graduation year",p.gradYear) +
+          field("gpa","GPA",p.gpa) + field("gpaScale","GPA scale",p.gpaScale) +
+          field("ielts","IELTS overall band",p.ielts) + field("sat","SAT (optional)",p.sat) +
+        '</div>' +
+      '</div>' +
+
+      '<div class="card" style="padding:20px;margin-bottom:16px">' +
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:4px">' +
+          '<h3 style="margin:0;font-size:15px">Activities & achievements</h3><span class="hint">'+(p.activities||[]).length+' of 10</span>' +
+        '</div>' +
+        '<p class="hint" style="margin:0 0 12px">Olympiads, clubs, work, family responsibilities — up to 10, reused on every application like Common App\'s Activities list.</p>' +
+        (p.activities||[]).map(function(a){
+          return '<div class="activity-row">' +
+            '<div class="activity-main">' +
+              '<div class="activity-top"><span class="tag" style="font-size:11px">'+esc(a.category)+'</span><span class="mono hint">'+esc(a.hours)+'h/wk · '+esc(a.weeks)+'wk/yr</span></div>' +
+              '<div style="font-weight:700;font-size:13.5px;margin-top:6px">'+esc(a.role)+' — '+esc(a.org)+'</div>' +
+              (a.description ? '<div class="hint" style="margin-top:3px">'+esc(a.description)+'</div>' : '') +
+            '</div>' +
+            '<button type="button" class="btn btn-ghost btn-sm" data-remove-activity="'+a.id+'">Remove</button>' +
+          '</div>';
+        }).join("") +
+        (((p.activities||[]).length < 10) ?
+          '<div class="add-row">' +
+            '<div class="form-grid">' +
+              '<div class="field"><label for="newActCat">Category</label><select id="newActCat">'+ACTIVITY_CATEGORIES.map(function(c){return '<option>'+c+'</option>';}).join("")+'</select></div>' +
+              '<div class="field"><label for="newActRole">Your role</label><input id="newActRole" placeholder="e.g. Team captain"></div>' +
+              '<div class="field"><label for="newActOrg">Organization</label><input id="newActOrg" placeholder="e.g. Robotics club"></div>' +
+              '<div style="display:flex;gap:10px"><div class="field"><label for="newActHours">Hrs/week</label><input id="newActHours" inputmode="numeric" style="width:70px"></div><div class="field"><label for="newActWeeks">Wks/year</label><input id="newActWeeks" inputmode="numeric" style="width:70px"></div></div>' +
+            '</div>' +
+            '<div class="field" style="margin-top:10px"><label for="newActDesc">What did you do? (optional)</label><textarea id="newActDesc" rows="2"></textarea></div>' +
+            '<button type="button" class="btn btn-ghost btn-sm" id="addActivityBtn" style="margin-top:10px">+ Add activity</button>' +
+          '</div>'
+        : '<p class="hint">Activities list is full (10/10) — remove one to add another, like Common App.</p>') +
+      '</div>' +
+
+      '<div class="card" style="padding:20px;margin-bottom:16px">' +
+        '<h3 style="margin:0 0 6px;font-size:15px">Personal statement</h3>' +
+        '<p class="hint" style="margin:0 0 10px">Reused as the starting draft for every application — tailor it per school in the apply flow.</p>' +
+        '<div class="field"><textarea id="f_statement" rows="5">'+esc(p.statement)+'</textarea></div>' +
+      '</div>' +
+
+      '<div class="card" style="padding:20px;margin-bottom:16px">' +
+        '<h3 style="margin:0 0 14px;font-size:15px">Documents</h3>' +
+        docs.map(function(d){
+          var cur = p.documents && p.documents[d[0]];
+          return '<div class="doc-row'+(cur?' done':'')+'">' +
+            '<div class="doc-info"><span class="doc-dot'+(cur?' on':'')+'"></span><div><div style="font-weight:600;font-size:13.5px">'+d[1]+'</div><div class="doc-name">'+(cur?esc(cur.name):d[2])+'</div></div></div>' +
+            '<button type="button" class="btn btn-ghost btn-sm file-btn">'+(cur?"Replace":"Upload")+'<input type="file" data-doc="'+d[0]+'"></button>' +
+          '</div>';
+        }).join("") +
+      '</div>' +
+
+      '<div class="card" style="padding:20px;margin-bottom:16px">' +
+        '<h3 style="margin:0 0 6px;font-size:15px">Recommenders</h3>' +
+        '<p class="hint" style="margin:0 0 12px">Invite a teacher or counselor once — every school you apply to can see their letter, same as Common App.</p>' +
+        (p.recommenders||[]).map(function(r){
+          return '<div class="doc-row'+(r.status==="submitted"?' done':'')+'">' +
+            '<div class="doc-info"><span class="doc-dot'+(r.status==="submitted"?' on':'')+'"></span><div><div style="font-weight:600;font-size:13.5px">'+esc(r.name)+' · '+esc(r.role)+'</div><div class="doc-name">'+esc(r.email)+'</div></div></div>' +
+            '<div style="display:flex;gap:6px;align-items:center">' + pillHtml(r.status==="submitted"?"Submitted":"Invited", r.status==="submitted"?"good":"info") +
+              (r.status!=="submitted" ? '<button type="button" class="btn btn-ghost btn-sm" data-mark-recommender="'+r.id+'">Mark submitted</button>' : '') +
+              '<button type="button" class="btn btn-ghost btn-sm" data-remove-recommender="'+r.id+'">Remove</button>' +
+            '</div>' +
+          '</div>';
+        }).join("") +
+        '<div class="add-row">' +
+          '<div class="form-grid">' +
+            '<div class="field"><label for="newRecName">Name</label><input id="newRecName" placeholder="Full name"></div>' +
+            '<div class="field"><label for="newRecRole">Relationship</label><input id="newRecRole" placeholder="e.g. Teacher, Counselor"></div>' +
+          '</div>' +
+          '<div class="field" style="margin-top:10px"><label for="newRecEmail">Email</label><input id="newRecEmail" type="email" placeholder="name@school.example"></div>' +
+          '<button type="button" class="btn btn-ghost btn-sm" id="addRecommenderBtn" style="margin-top:10px">+ Invite recommender</button>' +
+        '</div>' +
+      '</div>' +
+
+      '<button class="btn btn-primary" type="submit">Save profile</button>' +
+    '</form>' +
+  '</section>';
+
+  function field(id,label,val,type){
+    return '<div class="field"><label for="f_'+id+'">'+label+'</label><input id="f_'+id+'" type="'+(type||"text")+'" value="'+esc(val||"")+'"></div>';
+  }
+}
+
+/* ===================== RENDER: APPLICATIONS ===================== */
+function renderApplications(){
+  var apps = state.apps.slice().sort(function(a,b){ return b.updatedAt - a.updatedAt; });
+  var counts = {draft:0,submitted:0,review:0,decided:0};
+  apps.forEach(function(a){
+    if(a.status==="draft") counts.draft++;
+    else if(a.status==="submitted") counts.submitted++;
+    else if(a.status==="review") counts.review++;
+    else counts.decided++;
+  });
+
+  return '<section class="section" style="padding-top:28px">' +
+    '<div class="eyebrow">My Colleges</div><h2 style="margin:4px 0 18px;font-size:26px">Every school, one list</h2>' +
+    '<div class="dash-stats">' +
+      '<div class="card" style="padding:16px"><div class="n mono" style="font-size:24px;color:var(--muted)">'+counts.draft+'</div><div class="hint">Draft</div></div>' +
+      '<div class="card" style="padding:16px"><div class="n mono" style="font-size:24px;color:var(--info)">'+counts.submitted+'</div><div class="hint">Submitted</div></div>' +
+      '<div class="card" style="padding:16px"><div class="n mono" style="font-size:24px;color:var(--warn)">'+counts.review+'</div><div class="hint">Under review</div></div>' +
+      '<div class="card" style="padding:16px"><div class="n mono" style="font-size:24px;color:var(--good)">'+counts.decided+'</div><div class="hint">Decided</div></div>' +
+    '</div>' +
+    (apps.length ? apps.map(appStubHtml).join("") : '<div class="card empty">No colleges yet. Explore universities and hit "Start application".</div>') +
+    '<button class="btn btn-ghost" data-go="explore">+ Add another college</button>' +
+  '</section>';
+}
+
+function appStubHtml(a){
+  var u = uniById(a.uniId);
+  if(!u) return "";
+  var meta = STATUS_META[a.status];
+  var cl = checklistFor(a, u);
+  var decided = a.status==="admitted" || a.status==="declined" || a.status==="waitlisted";
+  var segs = [0,1,2,3].map(function(i){ return '<div class="tl-seg'+(i<=meta.step?' on':'')+'"></div>'; }).join("");
+
+  var statusOptions = ["draft","submitted","review","admitted","waitlisted","declined"].map(function(k){
+    return '<option value="'+k+'"'+(a.status===k?' selected':'')+'>'+STATUS_META[k].label+'</option>';
+  }).join("");
+
+  return '<div class="card stub">' +
+    '<div class="stub-main">' +
+      '<div class="stub-title"><div><div class="stub-name">'+esc(u.name)+'</div><div class="hint">'+esc(u.city+", "+u.country)+' · '+esc(a.program)+'</div></div>' + pillHtml(meta.label, meta.color) + '</div>' +
+      '<div class="timeline">'+segs+'</div>' +
+      '<div class="tl-labels">'+STEP_LABELS.map(function(l){return '<span>'+l+'</span>';}).join("")+'</div>' +
+      (decided ? '' :
+        '<div class="bar-track" style="margin-top:12px"><div class="bar-fill" style="width:'+cl.pct+'%"></div></div>' +
+        '<div class="checklist-mini">' + cl.items.map(function(it){
+          return '<span class="ck-chip'+(it.done?' on':'')+'">'+(it.done?"✓":"○")+' '+esc(it.label)+'</span>';
+        }).join("") + '</div>'
+      ) +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap;gap:8px">' +
+        '<span class="hint">Last update '+daysAgo(a.updatedAt)+'</span>' +
+        '<button class="btn btn-ghost btn-sm" data-go="uni-'+a.uniId+'">View school</button>' +
+      '</div>' +
+      '<div class="demo-control"><label for="statusSel_'+a.id+'">For this walkthrough — jump to stage:</label>' +
+        '<select id="statusSel_'+a.id+'" data-status-select="'+a.id+'">'+statusOptions+'</select>' +
+      '</div>' +
+    '</div>' +
+    '<div class="stub-side"><span class="stamp">'+esc(u.cc)+'</span>' + pillHtml(meta.label, meta.color) + '<span class="hint" style="font-size:11px">'+cl.doneCount+'/'+cl.total+' complete</span></div>' +
+  '</div>';
+}
+
+/* ===================== RENDER: APPLY FLOW ===================== */
+function renderApply(id){
+  var u = uniById(id);
+  if(!u) return '<section class="section"><p>University not found.</p></section>';
+  var existing = state.apps.find(function(a){ return a.uniId===id; });
+  if(existing){
+    return '<section class="section" style="padding-top:28px">' +
+      '<div class="card" style="padding:26px;text-align:center">' +
+        '<h2 style="margin:0 0 8px">You already started this one</h2>' +
+        '<p class="hint" style="margin:0 0 16px">'+esc(u.name)+' is already in your applications dashboard.</p>' +
+        '<button class="btn btn-primary" data-go="applications">Go to dashboard</button>' +
+      '</div></section>';
+  }
+
+  var p = state.profile;
+  var steps = ["Profile & program","Checklist","Essay","School question","Review & submit"];
+  var s = state.applyStep;
+  var lastStep = steps.length - 1;
+
+  var stepperHtml = '<div class="step-label"><span>Step '+(s+1)+' of '+steps.length+'</span><span>'+steps[s]+'</span></div>' +
+    '<div class="stepper">' + steps.map(function(_,i){ return '<div class="seg'+(i<s?' done':i===s?' cur':'')+'"></div>'; }).join("") + '</div>';
+
+  var body = "";
+  if(s===0){
+    body = '<div class="kv">' +
+      '<div class="kv-item"><div class="l">Applicant</div><div class="v" style="font-size:14px">'+esc(p.firstName+" "+p.lastName)+'</div></div>' +
+      '<div class="kv-item"><div class="l">IELTS on file</div><div class="v">'+esc(p.ielts||"—")+' (needs '+u.ielts.toFixed(1)+')</div></div>' +
+    '</div>' +
+    '<div class="field" style="margin-top:16px"><label for="applyProgram">Program</label>' +
+      '<select id="applyProgram">' + u.programs.map(function(pr){ return '<option>'+esc(pr)+'</option>'; }).join("") + '</select>' +
+    '</div>' +
+    (parseFloat(p.ielts||0) < u.ielts ? '<p class="hint" style="color:var(--warn);margin-top:10px">Your IELTS on file is below this school\'s usual minimum — flag it for your advisor before submitting.</p>' : '');
+  } else if(s===1){
+    var docs = [["passport","Passport scan"],["transcript","Academic transcript"],["recommendation","Recommendation letter"],["photo","ID photo"]];
+    body = docs.map(function(d){
+      var ok = p.documents && p.documents[d[0]];
+      return '<div class="check-row"><div class="check-mark '+(ok?'ok':'bad')+'">'+(ok?"✓":"!")+'</div><div><div style="font-weight:600;font-size:13.5px">'+d[1]+'</div><div class="hint">'+(ok?"On file from your profile":"Missing — add it on your Profile page")+'</div></div></div>';
+    }).join("") +
+    '<div class="check-row"><div class="check-mark '+((p.activities||[]).length>0?'ok':'bad')+'">'+((p.activities||[]).length>0?"✓":"!")+'</div><div><div style="font-weight:600;font-size:13.5px">Activities list</div><div class="hint">'+((p.activities||[]).length>0 ? (p.activities||[]).length+" activities on file" : "Add at least one on your Profile page")+'</div></div></div>' +
+    '<div class="check-row"><div class="check-mark '+((p.recommenders||[]).length>0?'ok':'bad')+'">'+((p.recommenders||[]).length>0?"✓":"!")+'</div><div><div style="font-weight:600;font-size:13.5px">Recommender invited</div><div class="hint">'+((p.recommenders||[]).length>0 ? "Invited from your profile" : "Invite one on your Profile page")+'</div></div></div>' +
+    '<p class="hint" style="margin-top:12px">Missing something? <a href="#profile">Jump to your profile</a> and come back — your progress here is kept.</p>';
+  } else if(s===2){
+    body = '<p class="hint" style="margin-bottom:10px">Starting from your saved personal statement. Tighten it for '+esc(u.name)+' specifically.</p>' +
+      '<div class="field"><textarea id="applyEssay" rows="7">'+esc(p.statement)+'</textarea></div>';
+  } else if(s===3){
+    body = '<div class="fact-box" style="margin-top:0"><span class="fact-k">'+esc(u.name)+' asks</span>'+esc(u.supplementPrompt)+'</div>' +
+      '<div class="field" style="margin-top:14px"><label for="applySupplement">Your answer (~'+u.supplementWords+' words)</label><textarea id="applySupplement" rows="6">'+esc(state.applySupplement||"")+'</textarea></div>' +
+      '<p class="hint" style="margin-top:8px">This one is school-specific — it won\'t be reused anywhere else, unlike your shared personal statement.</p>';
+  } else {
+    var reviewProgram = document.getElementById("applyProgram") ? document.getElementById("applyProgram").value : u.programs[0];
+    var reviewSup = state.applySupplement || "";
+    body = '<div class="kv">' +
+      '<div class="kv-item"><div class="l">University</div><div class="v" style="font-size:14px">'+esc(u.name)+'</div></div>' +
+      '<div class="kv-item"><div class="l">Program</div><div class="v" style="font-size:14px">'+esc(reviewProgram)+'</div></div>' +
+      '<div class="kv-item"><div class="l">Deadline</div><div class="v" style="font-size:14px">'+esc(u.deadline)+'</div></div>' +
+      '<div class="kv-item"><div class="l">Application fee</div><div class="v" style="font-size:14px">'+esc(u.appFee)+'</div></div>' +
+    '</div>' +
+    '<div class="divider"></div>' +
+    '<h4 style="margin:0 0 10px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">What gets submitted</h4>' +
+    '<div class="check-row"><div class="check-mark ok">✓</div><div><div style="font-weight:600;font-size:13.5px">'+esc(p.firstName+" "+p.lastName)+'</div><div class="hint">IELTS '+esc(p.ielts||"—")+' · GPA '+esc(p.gpa||"—")+'/'+esc(p.gpaScale||"4.0")+'</div></div></div>' +
+    '<div class="check-row"><div class="check-mark ok">✓</div><div><div style="font-weight:600;font-size:13.5px">'+(p.activities||[]).length+' activities</div><div class="hint">Reused from your profile</div></div></div>' +
+    '<div class="check-row"><div class="check-mark ok">✓</div><div><div style="font-weight:600;font-size:13.5px">Personal statement</div><div class="hint">'+esc((p.statement||"").slice(0,70))+(p.statement && p.statement.length>70 ? "…" : "")+'</div></div></div>' +
+    '<div class="check-row"><div class="check-mark ok">✓</div><div><div style="font-weight:600;font-size:13.5px">School supplement</div><div class="hint">'+esc(reviewSup.slice(0,70))+(reviewSup.length>70?"…":"")+'</div></div></div>' +
+    '<a class="official-link" href="https://'+esc(u.applyUrl)+'" target="_blank" rel="noopener">Cross-check on the official site ↗<span>'+esc(u.applyUrl)+'</span></a>' +
+    '<p class="hint" style="margin-top:14px">Submitting creates a tracked application on your My Colleges page with a full draft → submitted → under review → decision timeline. There\'s no backend yet, so nothing is actually sent to the university — use the official site link above for the real submission.</p>';
+  }
+
+  return '<section class="section" style="padding-top:28px;max-width:640px;margin:0 auto">' +
+    '<button class="btn btn-ghost btn-sm" data-go="uni-'+u.id+'" style="margin-bottom:16px">&larr; Cancel</button>' +
+    '<div class="eyebrow">'+stampHtml(u)+'</div>' +
+    '<h2 style="margin:6px 0 20px;font-size:24px">Apply to '+esc(u.name)+'</h2>' +
+    stepperHtml +
+    '<div class="card" style="padding:22px;margin-top:18px">' + body + '</div>' +
+    '<div style="display:flex;justify-content:space-between;margin-top:18px">' +
+      (s>0 ? '<button class="btn btn-ghost" id="applyBack">Back</button>' : '<span></span>') +
+      (s<lastStep ? '<button class="btn btn-primary" id="applyNext">Continue</button>' : '<button class="btn btn-primary" id="applySubmit">Submit application</button>') +
+    '</div>' +
+  '</section>';
+}
+
+/* ===================== RENDER: RESOURCES ===================== */
+function renderResources(){
+  return '<section class="section" style="padding-top:28px">' +
+    '<div class="eyebrow">Resources</div><h2 style="margin:4px 0 6px;font-size:26px">The lessons behind the applications</h2>' +
+    '<p class="hint" style="max-width:56ch;margin-bottom:20px">Early drafts of the course content that will eventually live inside WeHelp — IELTS, essays, visas and scholarships, written for this exact shortlist of universities.</p>' +
+    '<div class="grid-cards">' +
+      RESOURCES.map(function(r){
+        return '<div class="card res-card"><span class="pill res-tag" style="background:var(--info-soft);color:var(--info)">'+esc(r.tag)+'</span>' +
+          '<h3 style="margin:2px 0 0;font-size:16.5px;font-family:\'Fraunces\',serif">'+esc(r.title)+'</h3>' +
+          '<p style="margin:0;color:var(--muted);font-size:13.5px">'+esc(r.body)+'</p></div>';
+      }).join("") +
+    '</div>' +
+  '</section>';
+}
+
+/* ===================== RENDER: DASHBOARD ===================== */
+function computeActivityFeed(){
+  var events = [];
+  state.apps.forEach(function(a){
+    var u = uniById(a.uniId); if(!u) return;
+    (a.history||[]).forEach(function(h){
+      events.push({label:h[0]+" — "+u.name, ts:h[1]});
+    });
+  });
+  (state.profile.recommenders||[]).forEach(function(r){
+    if(r.status==="submitted") events.push({label:r.name+"'s letter came in", ts:Date.now()-2*86400000});
+  });
+  events.sort(function(x,y){ return y.ts - x.ts; });
+  return events.slice(0,6);
+}
+
+function renderDashboard(){
+  var apps = state.apps.slice().sort(function(a,b){ return b.updatedAt - a.updatedAt; });
+  var pct = profileCompleteness(state.profile);
+  var decided = apps.filter(function(a){ return a.status==="admitted"||a.status==="declined"||a.status==="waitlisted"; }).length;
+  var active = apps.length - decided;
+  var feed = computeActivityFeed();
+  var todos = computeTodos();
+  var deadlineRows = apps.filter(function(a){ return a.status!=="admitted" && a.status!=="declined" && a.status!=="waitlisted"; })
+    .map(function(a){ var u = uniById(a.uniId); return u ? {u:u, a:a} : null; }).filter(Boolean);
+
+  return '<section class="section" style="padding-top:28px">' +
+    '<div class="eyebrow">Dashboard</div><h2 style="margin:4px 0 4px;font-size:26px">'+greeting()+', '+esc(state.profile.firstName||"there")+'</h2>' +
+    '<p class="hint" style="margin:0 0 20px">Your home base — profile status, every deadline, and what moved recently.</p>' +
+
+    '<div class="dash-stats">' +
+      '<div class="card" style="padding:16px"><div class="n mono" style="font-size:24px;color:var(--accent)">'+pct+'%</div><div class="hint">Profile complete</div></div>' +
+      '<div class="card" style="padding:16px"><div class="n mono" style="font-size:24px;color:var(--ink)">'+apps.length+'</div><div class="hint">Total colleges</div></div>' +
+      '<div class="card" style="padding:16px"><div class="n mono" style="font-size:24px;color:var(--info)">'+active+'</div><div class="hint">Active applications</div></div>' +
+      '<div class="card" style="padding:16px"><div class="n mono" style="font-size:24px;color:var(--good)">'+decided+'</div><div class="hint">Decisions in</div></div>' +
+    '</div>' +
+
+    '<div class="dash-grid">' +
+      '<div class="card" style="padding:20px">' +
+        '<h3 style="margin:0 0 12px;font-size:15px">Deadlines at a glance</h3>' +
+        (deadlineRows.length ? deadlineRows.map(function(r){
+          return '<div class="deadline-row"><div><div style="font-weight:700;font-size:13.5px">'+esc(r.u.name)+'</div><div class="hint">'+esc(r.u.deadline)+'</div></div>' + pillHtml(STATUS_META[r.a.status].label, STATUS_META[r.a.status].color) + '</div>';
+        }).join("") : '<p class="hint">No active applications yet — add a college from Explore.</p>') +
+      '</div>' +
+
+      '<div class="card" style="padding:20px">' +
+        '<h3 style="margin:0 0 12px;font-size:15px">Recent activity</h3>' +
+        (feed.length ? '<ul class="feed-list">' + feed.map(function(e){
+          return '<li><span>'+esc(e.label)+'</span><span class="hint">'+daysAgo(e.ts)+'</span></li>';
+        }).join("") + '</ul>' : '<p class="hint">Nothing yet — submit your first application to see it here.</p>') +
+      '</div>' +
+    '</div>' +
+
+    '<div class="card" style="padding:20px;margin-top:16px">' +
+      '<h3 style="margin:0 0 12px;font-size:15px">Outstanding tasks</h3>' +
+      (todos.length ? '<ul class="todo-list">' + todos.map(function(t){
+        return '<li><button data-go="'+t.href+'"><span>'+esc(t.label)+'</span><span class="hint">'+esc(t.sub)+'</span></button></li>';
+      }).join("") + '</ul>' : '<p class="hint">You\'re caught up.</p>') +
+    '</div>' +
+
+    '<div class="quick-links">' +
+      '<button class="card quick-link" data-go="explore"><b>Explore</b><span class="hint">Browse all '+UNIS.length+' universities</span></button>' +
+      '<button class="card quick-link" data-go="profile"><b>My Profile</b><span class="hint">Activities, essay, documents</span></button>' +
+      '<button class="card quick-link" data-go="applications"><b>My Colleges</b><span class="hint">Track every application</span></button>' +
+      '<button class="card quick-link" data-go="resources"><b>Resources</b><span class="hint">Guides for this process</span></button>' +
+    '</div>' +
+  '</section>';
+}
+
+/* ===================== MAIN RENDER ===================== */
+var lastRouteKey = null;
+function render(){
+  var route = parseHash();
+  var app = document.getElementById("app");
+
+  if(route.view!=="apply"){ state.applyStep = 0; state.applySupplement = ""; }
+
+  var html = "";
+  if(route.view==="home") html = renderHome();
+  else if(route.view==="dashboard") html = renderDashboard();
+  else if(route.view==="explore") html = renderExplore();
+  else if(route.view==="uni") html = renderUniDetail(route.id);
+  else if(route.view==="compare") html = renderCompare();
+  else if(route.view==="profile") html = renderProfile();
+  else if(route.view==="applications") html = renderApplications();
+  else if(route.view==="apply") html = renderApply(route.id);
+  else if(route.view==="resources") html = renderResources();
+  else html = renderHome();
+
+  app.innerHTML = html;
+  var routeKey = route.view + (route.id||"") + (route.view==="apply" ? ":"+state.applyStep : "");
+  if(routeKey !== lastRouteKey) window.scrollTo(0,0);
+  lastRouteKey = routeKey;
+
+  document.querySelectorAll(".sidebar-nav button").forEach(function(b){
+    b.classList.toggle("active", b.getAttribute("data-go")===route.view || (route.view==="uni" && b.getAttribute("data-go")==="explore"));
+  });
+  var pct = profileCompleteness(state.profile);
+  var pf = state.profile;
+  var initials = ((pf.firstName||"?")[0] + (pf.lastName||"?")[0]).toUpperCase();
+  document.getElementById("sidebarAvatar").textContent = initials;
+  document.getElementById("sidebarUserName").textContent = (pf.firstName||"Your") + " " + (pf.lastName||"profile");
+  document.getElementById("sidebarUserSub").textContent = pct===100 ? "Profile complete" : pct+"% of profile done";
+  document.getElementById("appsCount").textContent = state.apps.length;
+
+  bindViewEvents(route);
+}
+
+/* ===================== EVENT BINDING ===================== */
+function bindViewEvents(route){
+  document.querySelectorAll("[data-star]").forEach(function(b){
+    b.addEventListener("click", function(e){
+      e.stopPropagation();
+      var id = b.getAttribute("data-star");
+      var idx = state.shortlist.indexOf(id);
+      if(idx>-1) state.shortlist.splice(idx,1); else state.shortlist.push(id);
+      saveShortlist();
+      render();
+    });
+  });
+
+  document.querySelectorAll(".copybtn").forEach(function(b){
+    b.addEventListener("click", function(){
+      var text = b.getAttribute("data-copy");
+      function done(){ toast("Copied " + text); }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done).catch(done);
+      } else { done(); }
+    });
+  });
+
+  var bookBtn = document.getElementById("bookCallBtn");
+  if(bookBtn) bookBtn.addEventListener("click", function(){ toast("Not wired up yet — connect this to your real booking link"); });
+
+  if(route.view==="explore"){
+    var fq = document.getElementById("fq");
+    if(fq) fq.addEventListener("input", function(){ state.filters.q = fq.value; render(); setTimeout(function(){ var el=document.getElementById("fq"); if(el){ el.focus(); el.setSelectionRange(el.value.length,el.value.length); } },0); });
+    var fsel = document.getElementById("fsel");
+    if(fsel) fsel.addEventListener("change", function(){ state.filters.selectivity = fsel.value; render(); });
+    var ftu = document.getElementById("ftu");
+    if(ftu) ftu.addEventListener("input", function(){ state.filters.maxTuition = parseInt(ftu.value,10); render(); });
+    var fsch = document.getElementById("fsch");
+    if(fsch) fsch.addEventListener("change", function(){ state.filters.scholarshipOnly = fsch.checked; render(); });
+    document.querySelectorAll(".country-chip").forEach(function(c){
+      c.addEventListener("click", function(){
+        var country = c.getAttribute("data-country");
+        var idx = state.filters.countries.indexOf(country);
+        if(idx>-1) state.filters.countries.splice(idx,1); else state.filters.countries.push(country);
+        render();
+      });
+    });
+  }
+
+  if(route.view==="uni"){
+    document.querySelectorAll(".tab").forEach(function(t){
+      t.addEventListener("click", function(){ detailTab = t.getAttribute("data-tab"); render(); });
+    });
+  }
+
+  if(route.view==="compare"){
+    document.querySelectorAll("[data-compare-toggle]").forEach(function(c){
+      c.addEventListener("click", function(){
+        var id = c.getAttribute("data-compare-toggle");
+        var idx = state.compare.indexOf(id);
+        if(idx>-1) state.compare.splice(idx,1);
+        else if(state.compare.length<3) state.compare.push(id);
+        else toast("Remove one to add another");
+        render();
+      });
+    });
+    document.querySelectorAll("[data-uncompare]").forEach(function(c){
+      c.addEventListener("click", function(){
+        var id = c.getAttribute("data-uncompare");
+        state.compare = state.compare.filter(function(x){ return x!==id; });
+        render();
+      });
+    });
+  }
+
+  if(route.view==="profile"){
+    var form = document.getElementById("profileForm");
+    document.querySelectorAll("[data-doc]").forEach(function(input){
+      input.addEventListener("change", function(){
+        var key = input.getAttribute("data-doc");
+        var file = input.files && input.files[0];
+        if(!file) return;
+        state.profile.documents = state.profile.documents || {};
+        state.profile.documents[key] = {name: file.name};
+        saveProfile();
+        render();
+      });
+    });
+    if(form){
+      form.addEventListener("submit", function(e){
+        e.preventDefault();
+        var p = state.profile;
+        ["firstName","lastName","email","phone","country","city","school","gradYear","gpa","gpaScale","ielts","sat"].forEach(function(id){
+          var el = document.getElementById("f_"+id);
+          if(el) p[id] = el.value;
+        });
+        var st = document.getElementById("f_statement");
+        if(st) p.statement = st.value;
+        saveProfile();
+        render();
+      });
+    }
+
+    var addActBtn = document.getElementById("addActivityBtn");
+    if(addActBtn) addActBtn.addEventListener("click", function(){
+      var role = document.getElementById("newActRole").value.trim();
+      var org = document.getElementById("newActOrg").value.trim();
+      if(!role || !org){ toast("Add a role and organization first"); return; }
+      state.profile.activities = state.profile.activities || [];
+      state.profile.activities.push({
+        id: uid(),
+        category: document.getElementById("newActCat").value,
+        role: role, org: org,
+        hours: document.getElementById("newActHours").value || "0",
+        weeks: document.getElementById("newActWeeks").value || "0",
+        description: document.getElementById("newActDesc").value.trim()
+      });
+      saveProfile();
+      render();
+    });
+    document.querySelectorAll("[data-remove-activity]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var id = b.getAttribute("data-remove-activity");
+        state.profile.activities = (state.profile.activities||[]).filter(function(a){ return a.id!==id; });
+        saveProfile();
+        render();
+      });
+    });
+
+    var addRecBtn = document.getElementById("addRecommenderBtn");
+    if(addRecBtn) addRecBtn.addEventListener("click", function(){
+      var name = document.getElementById("newRecName").value.trim();
+      var email = document.getElementById("newRecEmail").value.trim();
+      if(!name || !email){ toast("Add a name and email first"); return; }
+      state.profile.recommenders = state.profile.recommenders || [];
+      state.profile.recommenders.push({
+        id: uid(), name: name,
+        role: document.getElementById("newRecRole").value.trim() || "Recommender",
+        email: email, status:"invited"
+      });
+      saveProfile();
+      toast("Invite saved for " + name + " — email sending isn't wired up yet");
+      render();
+    });
+    document.querySelectorAll("[data-mark-recommender]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var id = b.getAttribute("data-mark-recommender");
+        var r = (state.profile.recommenders||[]).find(function(x){ return x.id===id; });
+        if(r){ r.status = "submitted"; saveProfile(); render(); }
+      });
+    });
+    document.querySelectorAll("[data-remove-recommender]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var id = b.getAttribute("data-remove-recommender");
+        state.profile.recommenders = (state.profile.recommenders||[]).filter(function(r){ return r.id!==id; });
+        saveProfile();
+        render();
+      });
+    });
+  }
+
+  if(route.view==="applications"){
+    document.querySelectorAll("[data-status-select]").forEach(function(sel){
+      sel.addEventListener("change", function(){
+        var id = sel.getAttribute("data-status-select");
+        var app = state.apps.find(function(a){ return a.id===id; });
+        if(!app) return;
+        app.status = sel.value;
+        app.updatedAt = Date.now();
+        app.history.push([STATUS_META[app.status].label, app.updatedAt]);
+        saveApps();
+        toast(uniById(app.uniId).name + " → " + STATUS_META[app.status].label);
+        render();
+      });
+    });
+  }
+
+  if(route.view==="apply"){
+    var nextBtn = document.getElementById("applyNext");
+    var backBtn = document.getElementById("applyBack");
+    var submitBtn = document.getElementById("applySubmit");
+    if(nextBtn) nextBtn.addEventListener("click", function(){
+      if(state.applyStep===2){
+        var essay = document.getElementById("applyEssay");
+        if(essay) state.profile.statement = essay.value;
+        saveProfile();
+      }
+      if(state.applyStep===3){
+        var sup = document.getElementById("applySupplement");
+        if(sup) state.applySupplement = sup.value;
+      }
+      state.applyStep++; render();
+    });
+    if(backBtn) backBtn.addEventListener("click", function(){
+      if(state.applyStep===3){
+        var sup2 = document.getElementById("applySupplement");
+        if(sup2) state.applySupplement = sup2.value;
+      }
+      state.applyStep--; render();
+    });
+    if(submitBtn) submitBtn.addEventListener("click", function(){
+      var u = uniById(route.id);
+      var programEl = document.getElementById("applyProgram");
+      var now = Date.now();
+      var app = {id:uid(), uniId:u.id, status:"submitted", program: programEl?programEl.value:u.programs[0], createdAt:now, updatedAt:now,
+        supplementAnswer: state.applySupplement || "",
+        history:[["Draft",now-1000],["Submitted",now]]};
+      state.apps.push(app);
+      saveApps();
+      state.applySupplement = "";
+      toast("Application to " + u.name + " submitted");
+      go("applications");
+    });
+  }
+}
+
+render();
+})();
+</script>
