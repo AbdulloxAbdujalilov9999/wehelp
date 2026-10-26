@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WeHelp Agency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Same travel-document palette as the student site, tuned for a dense working board. */
+:root{
+  --bg:#F4F6F9; --surface:#FFFFFF; --surface-2:#EBEEF4;
+  --ink:#121B30; --muted:#5B657C; --faint:#8A93A8;
+  --line:#D7DCE6; --accent:#C8791F; --accent-ink:#5C3410; --accent-soft:#F6E4C9;
+  --good:#1F7A4D; --good-soft:#DCF0E3; --warn:#B4600F; --warn-soft:#FBE7CE;
+  --bad:#9C3B3B; --bad-soft:#F6DEDE; --info:#2A5CAA; --info-soft:#DCE6F8;
+  --shadow:0 1px 2px rgba(18,27,48,.06), 0 8px 24px -12px rgba(18,27,48,.16);
+  --radius:12px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1220; --surface:#161C2E; --surface-2:#1E2538;
+    --ink:#EDEFF5; --muted:#A9AFC2; --faint:#767E93;
+    --line:#2B3349; --accent:#E3A33E; --accent-ink:#2B1A08; --accent-soft:#3A2A13;
+    --good:#4EBE84; --good-soft:#163428; --warn:#E3A33E; --warn-soft:#3A2A13;
+    --bad:#E08080; --bad-soft:#3A1F1F; --info:#7FA8E8; --info-soft:#19263F;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1220; --surface:#161C2E; --surface-2:#1E2538;
+  --ink:#EDEFF5; --muted:#A9AFC2; --faint:#767E93;
+  --line:#2B3349; --accent:#E3A33E; --accent-ink:#2B1A08; --accent-soft:#3A2A13;
+  --good:#4EBE84; --good-soft:#163428; --warn:#E3A33E; --warn-soft:#3A2A13;
+  --bad:#E08080; --bad-soft:#3A1F1F; --info:#7FA8E8; --info-soft:#19263F;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"Fraunces",Georgia,serif;letter-spacing:-.01em;margin:0}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hide{display:none!important}
+.muted{color:var(--muted)} .faint{color:var(--faint)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:9px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer;border:1px solid transparent;text-decoration:none;white-space:nowrap}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-ghost{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.btn-ghost:hover{background:var(--surface-2)}
+.btn-sm{padding:5px 10px;font-size:12px;border-radius:7px}
+.btn-danger{background:var(--bad-soft);color:var(--bad)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.p-good{background:var(--good-soft);color:var(--good)} .p-warn{background:var(--warn-soft);color:var(--warn)}
+.p-bad{background:var(--bad-soft);color:var(--bad)} .p-info{background:var(--info-soft);color:var(--info)}
+.p-muted{background:var(--surface-2);color:var(--muted)}
+input[type=text],input[type=email],input[type=password],input[type=date],input[type=number],input[type=tel],select,textarea{padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);min-width:0}
+textarea{resize:vertical;min-height:70px;width:100%}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:var(--muted)}
+label.f input,label.f select,label.f textarea{font-weight:400;color:var(--ink);width:100%}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+
+/* Login */
+.login{min-height:100vh;display:grid;place-items:center;padding:16px}
+.login .card{width:100%;max-width:360px;padding:26px;display:flex;flex-direction:column;gap:14px}
+.mark{width:30px;height:30px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:inline-grid;place-items:center;font-family:"Fraunces",serif;font-weight:700}
+.err{color:var(--bad);font-size:12.5px;min-height:1em}
+
+/* Shell */
+header.top{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header.top .brand{display:flex;align-items:center;gap:8px;font-family:"Fraunces",serif;font-weight:700;font-size:17px}
+nav.tabs{display:flex;gap:4px}
+nav.tabs button{border:none;background:none;padding:7px 11px;border-radius:8px;font-weight:700;color:var(--muted);cursor:pointer}
+nav.tabs button.on{background:var(--surface-2);color:var(--ink)}
+header.top .right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+main{padding:16px}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.stat{padding:12px 14px}
+.stat b{display:block;font-size:20px;font-family:"Fraunces",serif}
+.stat span{font-size:11.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.toolbar input[type=text]{flex:1;min-width:160px;max-width:320px}
+.toolbar label{display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--muted);font-weight:600}
+
+/* Board */
+.board{display:grid;grid-template-columns:repeat(6,minmax(220px,1fr));gap:10px;overflow-x:auto;padding-bottom:8px;align-items:start}
+.col{background:var(--surface-2);border-radius:var(--radius);padding:8px;min-height:120px}
+.col.drop{outline:2px dashed var(--accent);outline-offset:-2px}
+.col h3{font-family:"Public Sans",sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);display:flex;justify-content:space-between;padding:4px 6px 8px}
+.s-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;cursor:pointer;display:flex;flex-direction:column;gap:6px}
+.s-card:hover{border-color:var(--accent)}
+.s-card .name{font-weight:700}
+.s-card .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:11.5px;color:var(--muted)}
+.bar{height:5px;border-radius:3px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--good)}
+.empty{font-size:12px;color:var(--faint);padding:8px 6px}
+
+/* Drawer */
+.backdrop{position:fixed;inset:0;background:rgba(10,14,24,.45);z-index:40}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(720px,100%);background:var(--bg);z-index:41;overflow-y:auto;box-shadow:-10px 0 30px rgba(0,0,0,.2)}
+.drawer-head{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;gap:10px;align-items:center;z-index:1}
+.drawer-head h2{font-size:20px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drawer-body{padding:16px;display:flex;flex-direction:column;gap:14px}
+.sec{padding:14px}
+.sec h3{font-size:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+.list-row{display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.list-row:last-child{border-bottom:none}
+.list-row .grow{flex:1;min-width:140px}
+.doc-st{border:1px solid var(--line);border-radius:7px;padding:3px 8px;font-size:11.5px;font-weight:700;cursor:pointer;background:var(--surface)}
+.doc-st.missing{color:var(--faint)} .doc-st.received{background:var(--info-soft);color:var(--info);border-color:transparent} .doc-st.verified{background:var(--good-soft);color:var(--good);border-color:transparent}
+.overdue{color:var(--bad);font-weight:700}
+.warnbox{background:var(--bad-soft);color:var(--bad);border-radius:9px;padding:9px 11px;font-size:12.5px;font-weight:600}
+.infobox{background:var(--info-soft);color:var(--info);border-radius:9px;padding:9px 11px;font-size:12.5px}
+.timeline .ev{font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--line)}
+.timeline .ev:last-child{border-bottom:none}
+.app-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 2px}
+.app-head b{flex:1;min-width:160px}
+.inline{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
+.inline > *{flex:1;min-width:120px}
+.inline > .btn{flex:none}
+
+table.t{width:100%;border-collapse:collapse;font-size:13px}
+table.t th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);padding:8px;border-bottom:1px solid var(--line)}
+table.t td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+.table-wrap{overflow-x:auto}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:9px;font-weight:600;font-size:13px;opacity:0;transition:.2s;z-index:60;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+dialog{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);color:var(--ink);padding:20px;width:min(460px,calc(100% - 32px))}
+dialog::backdrop{background:rgba(10,14,24,.45)}
+dialog form{display:flex;flex-direction:column;gap:10px}
+.copy{display:flex;gap:6px}
+.copy input{flex:1}
+@media (max-width:760px){
+  .board{grid-template-columns:1fr}
+  header.top .right .who{display:none}
+}
+</style>
+</head>
+<body>
+
+<div id="login" class="login hide">
+  <form class="card" id="loginForm">
+    <div style="display:flex;align-items:center;gap:8px"><span class="mark">W</span><h1 style="font-size:22px">WeHelp Agency</h1></div>
+    <label class="f">Email<input type="email" name="email" required autocomplete="username"></label>
+    <label class="f">Password<input type="password" name="password" required autocomplete="current-password"></label>
+    <div class="err" id="loginErr"></div>
+    <button class="btn btn-primary" type="submit">Sign in</button>
+    <a class="faint" href="/" style="font-size:12px">← Student site</a>
+  </form>
+</div>
+
+<div id="shell" class="hide">
+  <header class="top">
+    <div class="brand"><span class="mark">W</span>WeHelp</div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="board" class="on">Board</button>
+      <button data-tab="unis">Universities</button>
+      <button data-tab="staff">Team</button>
+    </nav>
+    <div class="right">
+      <span class="who faint" id="who"></span>
+      <button class="btn btn-ghost btn-sm" id="tgBtn">Connect Telegram</button>
+      <button class="btn btn-ghost btn-sm" id="logoutBtn">Sign out</button>
+    </div>
+  </header>
+  <main>
+    <section id="tab-board">
+      <div class="stats" id="stats"></div>
+      <div class="toolbar">
+        <button class="btn btn-primary" id="newStudentBtn">+ New student</button>
+        <input type="text" id="search" placeholder="Search name, phone or email">
+        <label><input type="checkbox" id="mineOnly"> Only mine</label>
+        <label><input type="checkbox" id="showClosed"> Closed cards</label>
+      </div>
+      <div class="board" id="board"></div>
+    </section>
+    <section id="tab-unis" class="hide"></section>
+    <section id="tab-staff" class="hide"></section>
+  </main>
+</div>
+
+<div id="drawerWrap" class="hide">
+  <div class="backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer" id="drawer" aria-label="Student"></aside>
+</div>
+
+<dialog id="dlg"></dialog>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+var STAGES = ["lead","documents","applied","admitted","visa","arrived"];
+var STAGE_LABEL = {lead:"Lead",documents:"Documents",applied:"Applied",admitted:"Admitted",visa:"Visa",arrived:"Arrived"};
+var APP_STATUS = {draft:"Draft",submitted:"Submitted",review:"Under review",admitted:"Admitted",waitlisted:"Waitlisted",declined:"Declined"};
+var APP_PILL = {draft:"p-muted",submitted:"p-info",review:"p-warn",admitted:"p-good",waitlisted:"p-warn",declined:"p-bad"};
+var IEQAS = {excellent:"IEQAS excellent",certified:"IEQAS certified",unverified:"Not checked yet",not_certified:"Not certified",restricted:"Visa restricted"};
+var IEQAS_PILL = {excellent:"p-good",certified:"p-good",unverified:"p-muted",not_certified:"p-warn",restricted:"p-bad"};
+
+var me = null, students = [], universities = [], openId = null;
+
+/* ---------- helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function som(n){ return Number(n||0).toLocaleString("en-US") + " so'm"; }
+function today(){ return new Date().toISOString().slice(0,10); }
+function daysTo(d){ return Math.round((new Date(d+"T00:00:00Z") - new Date(today()+"T00:00:00Z"))/86400000); }
+function dueHtml(d){
+  if(!d) return "";
+  var n = daysTo(d);
+  var cls = n < 0 ? "overdue" : (n <= 7 ? "p-warn pill" : "");
+  var txt = n < 0 ? (-n)+"d overdue" : (n === 0 ? "due today" : "due in "+n+"d");
+  return '<span class="'+cls+'" title="'+esc(d)+'">'+txt+'</span>';
+}
+function fmtTime(ts){ return new Date(ts).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}); }
+var toastT;
+function toast(m){ var t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(function(){t.classList.remove("show");},2000); }
+
+function api(method, path, body){
+  var opts = {method:method, headers:{}, credentials:"same-origin"};
+  if(body !== undefined){ opts.headers["content-type"]="application/json"; opts.body=JSON.stringify(body); }
+  return fetch(path, opts).then(function(r){
+    return r.json().catch(function(){ return {}; }).then(function(j){
+      if(r.status === 401 && path !== "/api/auth/login"){ showLogin(); }
+      if(!r.ok){ var e = new Error(j.error || ("Error "+r.status)); e.status=r.status; e.body=j; throw e; }
+      return j;
+    });
+  });
+}
+function fail(e){ toast(e.message || "Something went wrong"); }
+
+function copyText(text){
+  function fallback(){
+    var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    var ok = false; try{ ok = document.execCommand("copy"); }catch(e){}
+    document.body.removeChild(ta);
+    toast(ok ? "Copied" : "Select the text and copy it");
+  }
+  if(navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(function(){ toast("Copied"); }, fallback);
+  else fallback();
+}
+
+/* ---------- auth ---------- */
+function showLogin(){ $("shell").classList.add("hide"); $("drawerWrap").classList.add("hide"); $("login").classList.remove("hide"); }
+function showShell(){
+  $("login").classList.add("hide"); $("shell").classList.remove("hide");
+  $("who").textContent = me.name + " · " + me.role;
+  $("tgBtn").textContent = me.telegram_linked ? "Telegram ✓" : "Connect Telegram";
+  loadBoard(); loadUnis();
+}
+$("loginForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  var f = e.target;
+  $("loginErr").textContent = "";
+  api("POST","/api/auth/login",{email:f.email.value, password:f.password.value}).then(function(r){
+    if(r.user.role === "student"){ location.href = "/#dashboard"; return; }
+    me = r.user; showShell();
+  }).catch(function(err){ $("loginErr").textContent = err.message; });
+});
+$("logoutBtn").addEventListener("click", function(){ api("POST","/api/auth/logout",{}).then(showLogin); });
+$("tgBtn").addEventListener("click", function(){
+  api("POST","/api/auth/telegram-link",{}).then(function(r){
+    if(r.link){ window.open(r.link, "_blank"); toast("Press Start in Telegram"); }
+    else toast("Telegram bot is not configured on the server yet");
+  }).catch(fail);
+});
+
+/* ---------- tabs ---------- */
+$("tabs").addEventListener("click", function(e){
+  var b = e.target.closest("[data-tab]"); if(!b) return;
+  Array.prototype.forEach.call($("tabs").children, function(x){ x.classList.toggle("on", x===b); });
+  ["board","unis","staff"].forEach(function(t){ $("tab-"+t).classList.toggle("hide", t!==b.dataset.tab); });
+  if(b.dataset.tab==="unis") renderUnis();
+  if(b.dataset.tab==="staff") loadStaff();
+});
+
+/* ---------- board ---------- */
+function loadBoard(){
+  var q = new URLSearchParams();
+  if($("search").value.trim()) q.set("q", $("search").value.trim());
+  if($("mineOnly").checked) q.set("agent","me");
+  if($("showClosed").checked) q.set("closed","1");
+  api("GET","/api/board/students?"+q).then(function(r){ students = r.students; renderBoard(); }).catch(fail);
+  api("GET","/api/board/summary").then(renderStats).catch(function(){});
+}
+var searchT;
+$("search").addEventListener("input", function(){ clearTimeout(searchT); searchT=setTimeout(loadBoard, 250); });
+$("mineOnly").addEventListener("change", loadBoard);
+$("showClosed").addEventListener("change", loadBoard);
+
+function renderStats(s){
+  var active = STAGES.reduce(function(a,k){ return a + s.stages[k]; }, 0);
+  $("stats").innerHTML =
+    stat(active, "Active students") +
+    stat(s.stages.applied + s.stages.admitted, "Applied or admitted") +
+    stat(s.stages.visa + s.stages.arrived, "Visa or arrived") +
+    stat(s.documents_due_7d, "Docs due in 7 days") +
+    stat(som(s.paid_uzs), "Paid") +
+    stat(som(s.pending_uzs), "Waiting for payment");
+  function stat(v,l){ return '<div class="card stat"><b>'+esc(v)+'</b><span>'+esc(l)+'</span></div>'; }
+}
+
+function cardHtml(s){
+  var pct = s.docs_total ? Math.round(s.docs_done/s.docs_total*100) : 0;
+  return '<div class="s-card" draggable="true" data-id="'+s.id+'">' +
+    '<div class="name">'+esc(s.full_name)+'</div>' +
+    '<div class="row">' +
+      (s.target_intake ? '<span class="mono">'+esc(s.target_intake)+'</span>' : '') +
+      '<span>'+(s.program_type==="language"?"Language":"Degree")+'</span>' +
+      (s.apps ? '<span>· '+s.apps+' uni'+(s.apps>1?'s':'')+'</span>' : '') +
+      (s.has_account ? '<span class="pill p-info">account</span>' : '') +
+    '</div>' +
+    (s.docs_total ? '<div class="bar" title="'+s.docs_done+'/'+s.docs_total+' documents"><i style="width:'+pct+'%"></i></div>' +
+      '<div class="row"><span>'+s.docs_done+'/'+s.docs_total+' docs</span>'+(s.next_due ? dueHtml(s.next_due) : '')+'</div>' : '') +
+    ((s.unpaid_uzs>0 || s.restricted_warning) ? '<div class="row">' +
+      (s.unpaid_uzs>0 ? '<span class="pill p-warn">'+som(s.unpaid_uzs)+' unpaid</span>' : '') +
+      (s.restricted_warning ? '<span class="pill p-bad">⚠ restricted school</span>' : '') + '</div>' : '') +
+    (s.agent_name && s.agent_id !== me.id ? '<div class="row faint">'+esc(s.agent_name)+'</div>' : '') +
+  '</div>';
+}
+
+function renderBoard(){
+  $("board").innerHTML = STAGES.map(function(stage){
+    var list = students.filter(function(s){ return s.stage===stage; });
+    return '<div class="col" data-stage="'+stage+'"><h3><span>'+STAGE_LABEL[stage]+'</span><span>'+list.length+'</span></h3>' +
+      (list.length ? list.map(cardHtml).join("") : '<div class="empty">No one here yet</div>') + '</div>';
+  }).join("");
+}
+
+$("board").addEventListener("click", function(e){
+  var c = e.target.closest(".s-card"); if(c) openStudent(Number(c.dataset.id));
+});
+// Drag a card to another column to move the student to that stage.
+$("board").addEventListener("dragstart", function(e){
+  var c = e.target.closest(".s-card"); if(!c) return;
+  e.dataTransfer.setData("text/plain", c.dataset.id); e.dataTransfer.effectAllowed="move";
+});
+$("board").addEventListener("dragover", function(e){
+  var col = e.target.closest(".col"); if(!col) return;
+  e.preventDefault(); col.classList.add("drop");
+});
+$("board").addEventListener("dragleave", function(e){ var col=e.target.closest(".col"); if(col && !col.contains(e.relatedTarget)) col.classList.remove("drop"); });
+$("board").addEventListener("drop", function(e){
+  var col = e.target.closest(".col"); if(!col) return;
+  e.preventDefault(); col.classList.remove("drop");
+  var id = Number(e.dataTransfer.getData("text/plain"));
+  var s = students.find(function(x){ return x.id===id; });
+  if(!s || s.stage===col.dataset.stage) return;
+  s.stage = col.dataset.stage; renderBoard();
+  api("PATCH","/api/board/students/"+id,{stage:col.dataset.stage}).then(function(){ toast("Moved to "+STAGE_LABEL[col.dataset.stage]); loadBoard(); }).catch(function(err){ fail(err); loadBoard(); });
+});
+
+/* ---------- new student ---------- */
+$("newStudentBtn").addEventListener("click", function(){
+  var d = $("dlg");
+  d.innerHTML = '<form method="dialog" id="nsForm"><h3>New student</h3>' +
+    '<label class="f">Full name<input type="text" name="full_name" required></label>' +
+    '<div class="grid2"><label class="f">Phone<input type="tel" name="phone"></label><label class="f">City<input type="text" name="city"></label></div>' +
+    '<div class="grid2"><label class="f">Parent name<input type="text" name="parent_name"></label><label class="f">Parent phone<input type="tel" name="parent_phone"></label></div>' +
+    '<div class="grid2"><label class="f">Program<select name="program_type"><option value="degree">Degree (D-2 visa)</option><option value="language">Language program (D-4)</option></select></label>' +
+    '<label class="f">Target intake<input type="text" name="target_intake" placeholder="2027-03"></label></div>' +
+    '<label class="f">Package<input type="text" name="package" placeholder="Basic / Full with visa and housing"></label>' +
+    '<div class="err" id="nsErr"></div>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-ghost" value="cancel" formnovalidate>Cancel</button><button class="btn btn-primary" value="ok">Add</button></div></form>';
+  d.showModal();
+  $("nsForm").addEventListener("submit", function(e){
+    if(e.submitter && e.submitter.value === "cancel") return;
+    e.preventDefault();
+    var f = e.target, body = {};
+    ["full_name","phone","city","parent_name","parent_phone","program_type","target_intake","package"].forEach(function(k){ body[k]=f[k].value.trim(); });
+    api("POST","/api/board/students",body).then(function(r){ d.close(); loadBoard(); openStudent(r.student.id); }).catch(function(err){ $("nsErr").textContent=err.message; });
+  });
+});
+
+/* ---------- student drawer ---------- */
+var cur = null;
+function openStudent(id){
+  openId = id;
+  $("drawerWrap").classList.remove("hide");
+  $("drawer").innerHTML = '<div class="drawer-body faint">Loading…</div>';
+  refreshStudent();
+}
+function closeDrawer(){ openId = null; cur = null; $("drawerWrap").classList.add("hide"); loadBoard(); }
+$("drawerBackdrop").addEventListener("click", closeDrawer);
+document.addEventListener("keydown", function(e){ if(e.key==="Escape" && openId && !$("dlg").open) closeDrawer(); });
+
+function refreshStudent(){
+  if(!openId) return;
+  api("GET","/api/board/students/"+openId).then(function(r){ cur = r; renderDrawer(); }).catch(fail);
+}
+
+function uniOptions(programType){
+  return universities.map(function(u){
+    var blocked = programType==="language" ? u.restricted_language : u.restricted_degree;
+    return '<option value="'+esc(u.id)+'">'+(blocked?"⚠ ":"")+esc(u.name)+(u.in_catalog?"":" (other)")+'</option>';
+  }).join("");
+}
+
+function renderDrawer(){
+  var s = cur.student, apps = cur.applications, docs = cur.documents;
+  var docsByApp = {};
+  docs.forEach(function(d){ var k = d.application_id || "student"; (docsByApp[k]=docsByApp[k]||[]).push(d); });
+
+  var h = '<div class="drawer-head"><h2>'+esc(s.full_name)+'</h2>' +
+    '<select id="dStage" aria-label="Stage">'+STAGES.map(function(k){ return '<option value="'+k+'"'+(k===s.stage?' selected':'')+'>'+STAGE_LABEL[k]+'</option>'; }).join("")+'</select>' +
+    '<button class="btn btn-ghost btn-sm" id="dClose" aria-label="Close">✕</button></div><div class="drawer-body">';
+
+  if(s.closed) h += '<div class="infobox">This card is closed'+(s.closed_reason?': '+esc(s.closed_reason):'')+'. <button class="btn btn-ghost btn-sm" data-act="reopen">Reopen</button></div>';
+  apps.forEach(function(a){ if(a.restriction) h += '<div class="warnbox">⚠ '+esc(a.restriction)+' Move this student to an IEQAS-certified school.</div>'; });
+
+  // Contact + details
+  h += '<div class="card sec"><h3>Details <button class="btn btn-ghost btn-sm" data-act="save">Save</button></h3><div class="grid2" id="dFields">' +
+    fld("full_name","Full name",s.full_name) + fld("phone","Phone",s.phone,"tel") +
+    fld("email","Email",s.email,"email") + fld("city","City",s.city) +
+    fld("parent_name","Parent name",s.parent_name) + fld("parent_phone","Parent phone",s.parent_phone,"tel") +
+    '<label class="f">Program<select data-k="program_type"><option value="degree"'+(s.program_type==="degree"?" selected":"")+'>Degree (D-2)</option><option value="language"'+(s.program_type==="language"?" selected":"")+'>Language (D-4)</option></select></label>' +
+    fld("target_intake","Target intake",s.target_intake) + fld("package","Package",s.package) + fld("source","Source",s.source) +
+    '</div><label class="f" style="margin-top:10px">Notes<textarea data-k="notes">'+esc(s.notes)+'</textarea></label></div>';
+
+  // Share
+  h += '<div class="card sec"><h3>Family & student access</h3>' +
+    '<div class="inline"><button class="btn btn-ghost btn-sm" data-act="parent-link">'+(s.parent_token?"New parent link":"Create parent link")+'</button>' +
+    (s.user_id ? '<span class="pill p-info">Student has an account</span>' : '<button class="btn btn-ghost btn-sm" data-act="invite">Student invite code</button>') +
+    '<span class="faint" style="font-size:12px">'+(cur.parent_telegram_links? cur.parent_telegram_links+' parent Telegram linked' : 'No parent on Telegram yet')+'</span></div>' +
+    (s.parent_token ? '<div class="copy" style="margin-top:8px"><input type="text" readonly value="'+esc(location.origin+'/parent.html#'+s.parent_token)+'"><button class="btn btn-ghost btn-sm" data-copy="'+esc(location.origin+'/parent.html#'+s.parent_token)+'">Copy</button></div>' : '') +
+    (s.invite_code ? '<div class="copy" style="margin-top:8px"><input type="text" readonly value="Invite code: '+esc(s.invite_code)+'"><button class="btn btn-ghost btn-sm" data-copy="'+esc(s.invite_code)+'">Copy</button></div>' : '') +
+    '</div>';
+
+  // Applications + documents
+  h += '<div class="card sec"><h3>Universities & documents</h3>';
+  if(!apps.length) h += '<p class="faint">No applications yet. Adding one creates that university\'s document checklist.</p>';
+  apps.forEach(function(a){
+    var list = docsByApp[a.id] || [];
+    var done = list.filter(function(d){ return d.status!=="missing"; }).length;
+    h += '<div class="app-head"><b>'+esc(a.university)+(a.program?' — '+esc(a.program):'')+' <span class="faint" style="font-weight:400">'+(a.program_type==="language"?"language":"degree")+'</span></b>' +
+      '<select data-app-status="'+a.id+'">'+Object.keys(APP_STATUS).map(function(k){ return '<option value="'+k+'"'+(k===a.status?' selected':'')+'>'+APP_STATUS[k]+'</option>'; }).join("")+'</select>' +
+      '<input type="date" data-app-deadline="'+a.id+'" value="'+esc(a.deadline||"")+'" title="Application deadline">' +
+      '<button class="btn btn-ghost btn-sm" data-del-app="'+a.id+'" title="Remove application">✕</button></div>' +
+      '<div class="faint" style="font-size:12px">'+done+'/'+list.length+' documents · '+(a.deadline?dueHtml(a.deadline):'no deadline set')+'</div>';
+    h += docRows(list);
+  });
+  if(docsByApp.student){ h += '<div class="app-head"><b>Visa & other</b></div>' + docRows(docsByApp.student); }
+  h += '<div class="inline" style="margin-top:12px">' +
+    '<label class="f">Add university<select id="newAppUni">'+uniOptions(s.program_type)+'</select></label>' +
+    '<label class="f">Program<input type="text" id="newAppProgram" placeholder="e.g. Business"></label>' +
+    '<label class="f">Deadline<input type="date" id="newAppDeadline"></label>' +
+    '<button class="btn btn-primary btn-sm" data-act="add-app">Add</button></div>' +
+    '<div class="inline" style="margin-top:8px"><label class="f">Extra document<input type="text" id="newDocLabel" placeholder="e.g. Portfolio"></label>' +
+    '<label class="f">For<select id="newDocApp"><option value="">Student (general)</option>'+apps.map(function(a){ return '<option value="'+a.id+'">'+esc(a.university)+'</option>'; }).join("")+'</select></label>' +
+    '<label class="f">Due<input type="date" id="newDocDue"></label><button class="btn btn-ghost btn-sm" data-act="add-doc">Add</button></div>' +
+    (s.stage==="admitted"||s.stage==="visa" ? '<div style="margin-top:8px"><button class="btn btn-ghost btn-sm" data-act="visa-checklist">Add visa checklist</button></div>' : '') +
+    '</div>';
+
+  // Payments
+  h += '<div class="card sec"><h3>Payments</h3>';
+  if(!cur.invoices.length) h += '<p class="faint">No invoices. Parents see invoices on their page and can pay with Click or Payme.</p>';
+  cur.invoices.forEach(function(i){
+    var pill = {pending:"p-warn",paid:"p-good",cancelled:"p-muted",refunded:"p-info"}[i.status];
+    h += '<div class="list-row"><span class="grow">'+esc(i.description)+'<br><span class="faint" style="font-size:12px">#'+i.id+' · '+fmtTime(i.created_at)+(i.provider?' · '+esc(i.provider):'')+'</span></span>' +
+      '<b class="mono">'+som(i.amount_uzs)+'</b><span class="pill '+pill+'">'+i.status+'</span>' +
+      (i.status==="pending" ? '<button class="btn btn-ghost btn-sm" data-inv="'+i.id+'" data-to="paid-cash">Paid cash</button><button class="btn btn-ghost btn-sm" data-inv="'+i.id+'" data-to="paid-bank">Paid bank</button><button class="btn btn-ghost btn-sm" data-inv="'+i.id+'" data-to="cancelled">Cancel</button>' : '') +
+      (i.status==="paid" ? '<button class="btn btn-ghost btn-sm" data-inv="'+i.id+'" data-to="refunded">Record refund</button>' : '') +
+      '</div>';
+  });
+  h += '<div class="inline" style="margin-top:10px"><label class="f">Description<input type="text" id="invDesc" placeholder="Application package"></label>' +
+    '<label class="f">Amount (so\'m)<input type="number" id="invAmt" min="1000" step="1000"></label><button class="btn btn-primary btn-sm" data-act="add-inv">Create invoice</button></div></div>';
+
+  // Student's own portal data
+  if(cur.portal){
+    var p = cur.portal.profile;
+    h += '<div class="card sec"><h3>From the student site</h3><div class="grid2" style="font-size:13px">' +
+      kv("School",p.school)+kv("GPA",p.gpa)+kv("IELTS",p.ielts)+kv("SAT",p.sat)+kv("Activities",p.activities)+kv("Essay",p.statement_chars?p.statement_chars+" characters":"not started") +
+      '</div><p class="faint" style="font-size:12px;margin:8px 0 0">Shortlist: '+(cur.portal.shortlist.map(function(id){ var u=universities.find(function(x){return x.id===id;}); return esc(u?u.name:id); }).join(", ")||"—")+(cur.portal.saved_at?' · saved '+fmtTime(cur.portal.saved_at):'')+'</p></div>';
+  }
+
+  // Timeline + notes
+  h += '<div class="card sec"><h3>Timeline</h3><textarea id="noteText" placeholder="Add a note, or an update the family will see"></textarea>' +
+    '<div style="display:flex;gap:8px;margin:8px 0 10px"><button class="btn btn-ghost btn-sm" data-act="note">Private note</button><button class="btn btn-ghost btn-sm" data-act="update">Update for family</button></div>' +
+    '<div class="timeline">'+cur.events.map(function(e){ return '<div class="ev"><span class="faint">'+fmtTime(e.created_at)+(e.actor?' · '+esc(e.actor):'')+'</span>'+(e.public?'':' <span class="pill p-muted">private</span>')+'<br>'+esc(e.message)+'</div>'; }).join("")+'</div></div>';
+
+  h += '<div style="display:flex;gap:8px;justify-content:flex-end">' + (s.closed ? '' : '<button class="btn btn-ghost btn-sm" data-act="close">Close card</button>') +
+    (me.role==="admin" ? '<button class="btn btn-danger btn-sm" data-act="delete">Delete</button>' : '') + '</div>';
+
+  h += '</div>';
+  $("drawer").innerHTML = h;
+
+  function fld(k,l,v,t){ return '<label class="f">'+l+'<input type="'+(t||"text")+'" data-k="'+k+'" value="'+esc(v||"")+'"></label>'; }
+  function kv(k,v){ return '<div><span class="faint">'+k+':</span> '+esc(v==null||v===""?"—":v)+'</div>'; }
+}
+
+function docRows(list){
+  return list.map(function(d){
+    var next = {missing:"received",received:"verified",verified:"missing"}[d.status];
+    var lbl = {missing:"Missing",received:"Received",verified:"Checked ✓"}[d.status];
+    return '<div class="list-row"><button class="doc-st '+d.status+'" data-doc="'+d.id+'" data-next="'+next+'" title="Click to change">'+lbl+'</button>' +
+      '<span class="grow">'+esc(d.label)+'</span>' + (d.status==="missing" && d.due_date ? dueHtml(d.due_date) : '') +
+      '<input type="date" data-doc-due="'+d.id+'" value="'+esc(d.due_date||"")+'" title="Due date">' +
+      '<button class="btn btn-ghost btn-sm" data-del-doc="'+d.id+'" title="Remove">✕</button></div>';
+  }).join("");
+}
+
+$("drawer").addEventListener("click", function(e){
+  var t = e.target, s = cur && cur.student; if(!s) return;
+  if(t.id==="dClose") return closeDrawer();
+  if(t.dataset.copy) return copyText(t.dataset.copy);
+  if(t.dataset.doc) return api("PATCH","/api/board/documents/"+t.dataset.doc,{status:t.dataset.next}).then(refreshStudent).catch(fail);
+  if(t.dataset.delDoc){ if(confirmInline(t)) api("DELETE","/api/board/documents/"+t.dataset.delDoc).then(refreshStudent).catch(fail); return; }
+  if(t.dataset.delApp){ if(confirmInline(t)) api("DELETE","/api/board/applications/"+t.dataset.delApp).then(refreshStudent).catch(fail); return; }
+  if(t.dataset.inv){
+    var to = t.dataset.to, body = to.indexOf("paid-")===0 ? {status:"paid",provider:to.slice(5)} : {status:to};
+    if(!confirmInline(t)) return;
+    return api("PATCH","/api/board/invoices/"+t.dataset.inv, body).then(function(){ toast("Saved"); refreshStudent(); }).catch(fail);
+  }
+  var act = t.dataset.act; if(!act) return;
+  if(act==="save"){
+    var body = {};
+    $("drawer").querySelectorAll("[data-k]").forEach(function(el){ body[el.dataset.k] = el.value.trim(); });
+    api("PATCH","/api/board/students/"+s.id, body).then(function(){ toast("Saved"); refreshStudent(); }).catch(fail);
+  } else if(act==="parent-link"){
+    if(s.parent_token && !confirmInline(t, "Old link stops working. Click again")) return;
+    api("POST","/api/board/students/"+s.id+"/parent-link",{}).then(function(r){ copyText(location.origin + r.path); toast("Parent link copied. Send it on Telegram."); refreshStudent(); }).catch(fail);
+  } else if(act==="invite"){
+    api("POST","/api/board/students/"+s.id+"/invite",{}).then(function(r){ copyText(r.invite_code); toast("Invite code "+r.invite_code+" copied"); refreshStudent(); }).catch(fail);
+  } else if(act==="add-app"){
+    addApplication(false);
+  } else if(act==="add-doc"){
+    var label = $("newDocLabel").value.trim(); if(!label) return toast("Type the document name");
+    api("POST","/api/board/students/"+s.id+"/documents",{label:label, application_id:$("newDocApp").value||null, due_date:$("newDocDue").value||null}).then(refreshStudent).catch(fail);
+  } else if(act==="visa-checklist"){
+    api("POST","/api/board/students/"+s.id+"/visa-checklist",{}).then(refreshStudent).catch(fail);
+  } else if(act==="add-inv"){
+    var amt = Number($("invAmt").value);
+    api("POST","/api/board/students/"+s.id+"/invoices",{description:$("invDesc").value.trim(), amount_uzs:amt}).then(function(){ toast("Invoice created"); refreshStudent(); }).catch(fail);
+  } else if(act==="note" || act==="update"){
+    var text = $("noteText").value.trim(); if(!text) return;
+    api("POST","/api/board/students/"+s.id+"/notes",{text:text, public:act==="update"}).then(refreshStudent).catch(fail);
+  } else if(act==="close"){
+    var reason = prompt("Why is this card closed? (e.g. chose another agency)");
+    if(reason===null) return;
+    api("PATCH","/api/board/students/"+s.id,{closed:true, closed_reason:reason}).then(closeDrawer).catch(fail);
+  } else if(act==="reopen"){
+    api("PATCH","/api/board/students/"+s.id,{closed:false}).then(refreshStudent).catch(fail);
+  } else if(act==="delete"){
+    if(!confirmInline(t, "Delete forever? Click again")) return;
+    api("DELETE","/api/board/students/"+s.id).then(closeDrawer).catch(fail);
+  }
+});
+
+// Two-click confirm without a blocking dialog.
+function confirmInline(btn, msg){
+  if(btn.dataset.armed){ return true; }
+  var old = btn.textContent;
+  btn.dataset.armed = "1"; btn.textContent = msg || "Sure?";
+  setTimeout(function(){ if(btn.isConnected){ delete btn.dataset.armed; btn.textContent = old; } }, 3000);
+  return false;
+}
+
+function addApplication(force){
+  var s = cur.student;
+  var body = {university_id:$("newAppUni").value, program:$("newAppProgram").value.trim(), deadline:$("newAppDeadline").value||null, force:force};
+  api("POST","/api/board/students/"+s.id+"/applications", body).then(function(){ toast("Application and checklist added"); refreshStudent(); }).catch(function(err){
+    if(err.body && err.body.code==="restricted"){
+      var d = $("dlg");
+      d.innerHTML = '<form method="dialog"><h3>Visa-restricted university</h3><div class="warnbox">'+esc(err.message)+'</div><p class="muted">Students sent to this school may not get a visa. Only continue if the family knows and accepts this.</p>' +
+        '<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-ghost" value="no">Choose another school</button><button class="btn btn-danger" value="yes">Add anyway</button></div></form>';
+      d.showModal();
+      d.addEventListener("close", function onc(){ d.removeEventListener("close", onc); if(d.returnValue==="yes") addApplication(true); });
+    } else fail(err);
+  });
+}
+
+$("drawer").addEventListener("change", function(e){
+  var t = e.target;
+  if(t.id==="dStage") return api("PATCH","/api/board/students/"+cur.student.id,{stage:t.value}).then(function(){ toast("Stage: "+STAGE_LABEL[t.value]); refreshStudent(); }).catch(fail);
+  if(t.dataset.appStatus) return api("PATCH","/api/board/applications/"+t.dataset.appStatus,{status:t.value}).then(refreshStudent).catch(fail);
+  if(t.dataset.appDeadline) return api("PATCH","/api/board/applications/"+t.dataset.appDeadline,{deadline:t.value||null}).then(refreshStudent).catch(fail);
+  if(t.dataset.docDue) return api("PATCH","/api/board/documents/"+t.dataset.docDue,{due_date:t.value||null}).then(refreshStudent).catch(fail);
+});
+
+/* ---------- universities ---------- */
+function loadUnis(){
+  return api("GET","/api/universities?all=1").then(function(r){ universities = r.universities; if(!$("tab-unis").classList.contains("hide")) renderUnis(); });
+}
+function renderUnis(){
+  var el = $("tab-unis");
+  el.innerHTML = '<div class="card sec" style="margin-bottom:12px"><h3>Visa status of universities</h3>' +
+    '<p class="muted" style="margin:0 0 8px">Korea\'s IEQAS rating decides whether a school can bring in international students. In September 2026, 20 schools were restricted for a year (16 degree, 4 language). Re-check each school on the official Study in Korea list and update its status here; the date is saved automatically.</p>' +
+    '<div class="inline"><label class="f">Add a school<input type="text" id="newUniName" placeholder="University name"></label><label class="f">City<input type="text" id="newUniCity"></label><button class="btn btn-primary btn-sm" id="addUniBtn">Add</button></div></div>' +
+    '<div class="card table-wrap"><table class="t"><thead><tr><th>University</th><th>Status</th><th>Restricted for</th><th>Until</th><th>Checked</th><th>Note</th><th></th></tr></thead><tbody>' +
+    universities.map(function(u){
+      return '<tr data-uni="'+esc(u.id)+'"><td><b>'+esc(u.name)+'</b><br><span class="faint">'+esc(u.city||"")+(u.in_catalog?' · on student site':'')+'</span></td>' +
+        '<td><select data-u="ieqas_status">'+Object.keys(IEQAS).map(function(k){ return '<option value="'+k+'"'+(k===u.ieqas_status?' selected':'')+'>'+IEQAS[k]+'</option>'; }).join("")+'</select></td>' +
+        '<td><select data-u="restricted_programs"><option value="">—</option>'+["degree","language","all"].map(function(k){ return '<option value="'+k+'"'+(k===u.restricted_programs?' selected':'')+'>'+k+'</option>'; }).join("")+'</select></td>' +
+        '<td><input type="date" data-u="restricted_until" value="'+esc(u.restricted_until||"")+'"></td>' +
+        '<td class="mono faint">'+esc(u.ieqas_checked_at||"never")+'</td>' +
+        '<td><input type="text" data-u="ieqas_note" value="'+esc(u.ieqas_note||"")+'" style="min-width:160px"></td>' +
+        '<td><button class="btn btn-ghost btn-sm" data-checklist="'+esc(u.id)+'">Checklist</button></td></tr>';
+    }).join("") + '</tbody></table></div>';
+}
+$("tab-unis").addEventListener("change", function(e){
+  var t = e.target, row = t.closest("[data-uni]"); if(!row || !t.dataset.u) return;
+  var body = {}; body[t.dataset.u] = t.value || null;
+  api("PATCH","/api/universities/"+row.dataset.uni, body).then(function(){ toast("Saved"); return loadUnis(); }).catch(fail);
+});
+$("tab-unis").addEventListener("click", function(e){
+  var t = e.target;
+  if(t.id==="addUniBtn"){
+    var name = $("newUniName").value.trim(); if(!name) return;
+    return api("POST","/api/universities",{name:name, city:$("newUniCity").value.trim()}).then(function(){ toast("Added"); loadUnis(); }).catch(fail);
+  }
+  if(t.dataset.checklist) editChecklist(t.dataset.checklist, "degree");
+});
+function editChecklist(uniId, type){
+  api("GET","/api/universities/"+encodeURIComponent(uniId)+"/documents?program_type="+type).then(function(r){
+    var u = universities.find(function(x){ return x.id===uniId; });
+    var d = $("dlg");
+    d.innerHTML = '<form method="dialog" id="clForm"><h3>'+esc(u?u.name:uniId)+' checklist</h3>' +
+      '<label class="f">Program<select id="clType"><option value="degree"'+(type==="degree"?" selected":"")+'>Degree</option><option value="language"'+(type==="language"?" selected":"")+'>Language program</option></select></label>' +
+      '<p class="faint" style="margin:0;font-size:12px">'+(r.custom?"Custom list for this school.":"Using the default list. Edit it to make one just for this school.")+' One document per line. New applications use this list.</p>' +
+      '<textarea id="clText" style="min-height:220px">'+esc(r.documents.map(function(x){ return x.label; }).join("\n"))+'</textarea>' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-ghost" value="cancel" formnovalidate>Cancel</button><button class="btn btn-primary" value="ok">Save for this school</button></div></form>';
+    d.showModal();
+    $("clType").addEventListener("change", function(){ d.close(); editChecklist(uniId, this.value); });
+    $("clForm").addEventListener("submit", function(e){
+      if(e.submitter && e.submitter.value==="cancel") return;
+      e.preventDefault();
+      var docs = $("clText").value.split("\n").map(function(l){ return {label:l.trim()}; }).filter(function(x){ return x.label; });
+      api("PUT","/api/universities/"+encodeURIComponent(uniId)+"/documents",{program_type:$("clType").value, documents:docs}).then(function(){ d.close(); toast("Checklist saved"); }).catch(fail);
+    });
+  }).catch(fail);
+}
+
+/* ---------- team ---------- */
+function loadStaff(){
+  api("GET","/api/board/staff").then(function(r){
+    var el = $("tab-staff");
+    el.innerHTML = '<div class="card table-wrap" style="margin-bottom:12px"><table class="t"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Telegram</th></tr></thead><tbody>' +
+      r.staff.map(function(u){ return '<tr><td>'+esc(u.name)+'</td><td>'+esc(u.email)+'</td><td>'+esc(u.role)+'</td><td>'+(u.telegram_linked?"✓":"—")+'</td></tr>'; }).join("") + '</tbody></table></div>' +
+      (me.role==="admin" ? '<form class="card sec" id="staffForm"><h3>Add a team member</h3><div class="grid2">' +
+        '<label class="f">Name<input type="text" name="name" required></label><label class="f">Email<input type="email" name="email" required></label>' +
+        '<label class="f">Temporary password<input type="text" name="password" minlength="8" required></label>' +
+        '<label class="f">Role<select name="role"><option value="agent">Agent</option><option value="admin">Admin</option></select></label></div>' +
+        '<div style="margin-top:10px"><button class="btn btn-primary btn-sm">Add</button></div></form>' : '<p class="faint">Only admins can add team members.</p>');
+    var f = $("staffForm");
+    if(f) f.addEventListener("submit", function(e){
+      e.preventDefault();
+      api("POST","/api/board/staff",{name:f.name.value, email:f.email.value, password:f.password.value, role:f.role.value}).then(function(){ toast("Added. Share the password privately."); loadStaff(); }).catch(fail);
+    });
+  }).catch(fail);
+}
+
+/* ---------- start ---------- */
+api("GET","/api/auth/me").then(function(r){
+  if(r.user && r.user.role !== "student"){ me = r.user; showShell(); }
+  else showLogin();
+}).catch(showLogin);
+
+})();
+</script>
+</body>
+</html>

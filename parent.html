@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>WeHelp · Progress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F6F9; --surface:#FFFFFF; --surface-2:#EBEEF4;
+  --ink:#121B30; --muted:#5B657C; --faint:#8A93A8;
+  --line:#D7DCE6; --accent:#C8791F; --accent-ink:#5C3410; --accent-soft:#F6E4C9;
+  --good:#1F7A4D; --good-soft:#DCF0E3; --warn:#B4600F; --warn-soft:#FBE7CE;
+  --bad:#9C3B3B; --bad-soft:#F6DEDE; --info:#2A5CAA; --info-soft:#DCE6F8;
+  --shadow:0 1px 2px rgba(18,27,48,.06), 0 8px 24px -12px rgba(18,27,48,.16);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1220; --surface:#161C2E; --surface-2:#1E2538;
+    --ink:#EDEFF5; --muted:#A9AFC2; --faint:#767E93;
+    --line:#2B3349; --accent:#E3A33E; --accent-ink:#2B1A08; --accent-soft:#3A2A13;
+    --good:#4EBE84; --good-soft:#163428; --warn:#E3A33E; --warn-soft:#3A2A13;
+    --bad:#E08080; --bad-soft:#3A1F1F; --info:#7FA8E8; --info-soft:#19263F;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1220; --surface:#161C2E; --surface-2:#1E2538;
+  --ink:#EDEFF5; --muted:#A9AFC2; --faint:#767E93;
+  --line:#2B3349; --accent:#E3A33E; --accent-ink:#2B1A08; --accent-soft:#3A2A13;
+  --good:#4EBE84; --good-soft:#163428; --warn:#E3A33E; --warn-soft:#3A2A13;
+  --bad:#E08080; --bad-soft:#3A1F1F; --info:#7FA8E8; --info-soft:#19263F;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2{font-family:"Fraunces",Georgia,serif;letter-spacing:-.01em;margin:0}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 40px}
+.top{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.mark{width:30px;height:30px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:inline-grid;place-items:center;font-family:"Fraunces",serif;font-weight:700}
+.top b{font-family:"Fraunces",serif;font-size:18px}
+.langs{margin-left:auto;display:flex;gap:4px}
+.langs button{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:7px;padding:4px 9px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+.langs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:18px;margin-bottom:14px}
+.card h2{font-size:18px;margin-bottom:12px}
+.hello h1{font-size:26px;margin-bottom:4px}
+.muted{color:var(--muted)} .faint{color:var(--faint)}
+.steps{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:0}
+.steps li{display:flex;gap:12px;align-items:flex-start;padding-bottom:14px;position:relative}
+.steps li:not(:last-child)::before{content:"";position:absolute;left:11px;top:24px;bottom:0;width:2px;background:var(--line)}
+.steps li.done:not(:last-child)::before{background:var(--good)}
+.dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);background:var(--surface);flex:none;display:grid;place-items:center;font-size:12px;font-weight:700;z-index:1}
+.done .dot{background:var(--good);border-color:var(--good);color:#fff}
+.now .dot{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+.now b{color:var(--accent)}
+.row{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:none}
+.row .grow{flex:1;min-width:0}
+.pill{display:inline-flex;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.p-good{background:var(--good-soft);color:var(--good)} .p-warn{background:var(--warn-soft);color:var(--warn)}
+.p-bad{background:var(--bad-soft);color:var(--bad)} .p-info{background:var(--info-soft);color:var(--info)} .p-muted{background:var(--surface-2);color:var(--muted)}
+.bar{height:8px;border-radius:5px;background:var(--surface-2);overflow:hidden;margin:6px 0 4px}
+.bar i{display:block;height:100%;background:var(--good)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:10px;padding:9px 14px;font-weight:700;font-size:13.5px;cursor:pointer;border:1px solid transparent;text-decoration:none;font-family:inherit}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-ghost{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.pay{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.warnbox{background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;margin-top:8px}
+.ev{padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.ev:last-child{border-bottom:none}
+details summary{cursor:pointer;font-weight:700;padding:6px 0}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.center{text-align:center;padding:60px 16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><span class="mark">W</span><b>WeHelp</b>
+    <div class="langs" id="langs"><button data-l="uz">O'z</button><button data-l="ru">Рус</button><button data-l="en">Eng</button></div>
+  </div>
+  <div id="app"><div class="center faint">…</div></div>
+</div>
+<script>
+(function(){
+"use strict";
+var T = {
+  uz:{hello:"Assalomu alaykum!", sub:"{name} uchun WeHelp jarayoni", progress:"Jarayon", now:"Hozir", unis:"Universitetlar", docs:"Hujjatlar", docsOf:"{a} / {b} tayyor", pay:"To'lovlar", payWith:"To'lash", paid:"To'langan", pending:"Kutilmoqda", refunded:"Qaytarilgan", news:"Yangiliklar", tg:"Telegramda xabar olish", agent:"Sizning menejeringiz", none:"Hozircha yo'q", bad:"Bu havola yaroqsiz. WeHelp'dan yangisini so'rang.", restricted:"Bu universitetda viza cheklovi bor. Menejeringiz bilan gaplashing.", missing:"Kerak", received:"Qabul qilindi", verified:"Tekshirildi", due:"muddat", intake:"Qabul", noPay:"Onlayn to'lov hali ulanmagan. Menejeringizga murojaat qiling.",
+    st:{draft:"Tayyorlanmoqda",submitted:"Topshirildi",review:"Ko'rib chiqilmoqda",admitted:"Qabul qilindi",waitlisted:"Kutish ro'yxatida",declined:"Rad etildi"}},
+  ru:{hello:"Здравствуйте!", sub:"Путь {name} с WeHelp", progress:"Прогресс", now:"Сейчас", unis:"Университеты", docs:"Документы", docsOf:"Готово {a} из {b}", pay:"Оплата", payWith:"Оплатить", paid:"Оплачено", pending:"Ожидает", refunded:"Возвращено", news:"Новости", tg:"Получать новости в Telegram", agent:"Ваш менеджер", none:"Пока нет", bad:"Ссылка недействительна. Попросите новую у WeHelp.", restricted:"У этого университета ограничение на визы. Обсудите с менеджером.", missing:"Нужно", received:"Получено", verified:"Проверено", due:"срок", intake:"Набор", noPay:"Онлайн-оплата пока не подключена. Свяжитесь с менеджером.",
+    st:{draft:"Готовится",submitted:"Подано",review:"На рассмотрении",admitted:"Зачислен",waitlisted:"В листе ожидания",declined:"Отказ"}},
+  en:{hello:"Hello!", sub:"{name}'s journey with WeHelp", progress:"Progress", now:"Now", unis:"Universities", docs:"Documents", docsOf:"{a} of {b} ready", pay:"Payments", payWith:"Pay with", paid:"Paid", pending:"Waiting", refunded:"Refunded", news:"Updates", tg:"Get updates on Telegram", agent:"Your WeHelp manager", none:"Nothing yet", bad:"This link is not valid. Ask WeHelp for a new one.", restricted:"This university has a visa restriction. Talk to your manager.", missing:"Needed", received:"Received", verified:"Checked", due:"due", intake:"Intake", noPay:"Online payment is not connected yet. Contact your manager.",
+    st:{draft:"Preparing",submitted:"Submitted",review:"Under review",admitted:"Admitted",waitlisted:"Waitlisted",declined:"Not admitted"}}
+};
+var ST_PILL = {draft:"p-muted",submitted:"p-info",review:"p-warn",admitted:"p-good",waitlisted:"p-warn",declined:"p-bad"};
+var lang = "uz";
+// Uzbek by default; Russian if the phone is set to Russian. English stays one tap away.
+try{ lang = localStorage.getItem("wh_lang") || ((navigator.language||"").slice(0,2)==="ru" ? "ru" : "uz"); }catch(e){}
+if(!T[lang]) lang = "uz";
+var data = null;
+var token = (location.hash||"").slice(1);
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function t(k, vars){ var s = T[lang][k]; if(vars) Object.keys(vars).forEach(function(v){ s = s.replace("{"+v+"}", vars[v]); }); return s; }
+function som(n){ return Number(n).toLocaleString("en-US").replace(/,/g," ") + " so'm"; }
+function fmtDate(d){ return new Date(d).toLocaleDateString(lang==="en"?"en-GB":(lang==="ru"?"ru-RU":"uz-UZ"),{day:"numeric",month:"short",year:"numeric"}); }
+
+function render(){
+  document.documentElement.lang = lang;
+  Array.prototype.forEach.call(document.querySelectorAll("#langs button"), function(b){ b.classList.toggle("on", b.dataset.l===lang); });
+  var el = document.getElementById("app");
+  if(!data){ el.innerHTML = '<div class="card center">'+esc(t("bad"))+'</div>'; return; }
+  var s = data.student, h = "";
+
+  h += '<div class="card hello"><h1>'+esc(t("hello"))+'</h1><div class="muted">'+esc(t("sub",{name:s.first_name}))+(s.target_intake?' · '+esc(t("intake"))+' <span class="mono">'+esc(s.target_intake)+'</span>':'')+'</div>';
+  h += '<ol class="steps">' + data.stages.map(function(st, i){
+    var cls = i < s.stage_index ? "done" : (i === s.stage_index ? "now" : "");
+    return '<li class="'+cls+'"><span class="dot">'+(i < s.stage_index ? "✓" : (i+1))+'</span><div><b>'+esc(st[lang])+'</b>'+(cls==="now"?' <span class="pill p-info">'+esc(t("now"))+'</span>':'')+'</div></li>';
+  }).join("") + '</ol>';
+  if(data.telegram) h += '<a class="btn btn-ghost" href="'+esc(data.telegram)+'" target="_blank" rel="noopener">✈️ '+esc(t("tg"))+'</a>';
+  h += '</div>';
+
+  h += '<div class="card"><h2>'+esc(t("unis"))+'</h2>';
+  if(!data.applications.length) h += '<div class="faint">'+esc(t("none"))+'</div>';
+  data.applications.forEach(function(a){
+    h += '<div class="row"><div class="grow"><b>'+esc(a.university)+'</b><div class="faint" style="font-size:13px">'+esc(a.program||"")+(a.city?' · '+esc(a.city):'')+'</div></div><span class="pill '+ST_PILL[a.status]+'">'+esc(T[lang].st[a.status])+'</span></div>';
+    if(a.restriction) h += '<div class="warnbox">⚠ '+esc(t("restricted"))+'</div>';
+  });
+  h += '</div>';
+
+  var docs = data.documents, ready = docs.filter(function(d){ return d.status!=="missing"; }).length;
+  h += '<div class="card"><h2>'+esc(t("docs"))+'</h2>';
+  if(!docs.length) h += '<div class="faint">'+esc(t("none"))+'</div>';
+  else {
+    h += '<div class="muted">'+esc(t("docsOf",{a:ready,b:docs.length}))+'</div><div class="bar"><i style="width:'+Math.round(ready/docs.length*100)+'%"></i></div>';
+    var missing = docs.filter(function(d){ return d.status==="missing"; });
+    var seen = {};
+    missing.forEach(function(d){
+      if(seen[d.label]) return; seen[d.label]=1; // same document for several schools: show once
+      h += '<div class="row"><span class="grow">'+esc(d.label)+'</span>'+(d.due_date?'<span class="faint" style="font-size:12.5px">'+esc(t("due"))+' '+fmtDate(d.due_date)+'</span>':'')+'<span class="pill p-warn">'+esc(t("missing"))+'</span></div>';
+    });
+    var done = docs.filter(function(d){ return d.status!=="missing"; });
+    if(done.length){
+      h += '<details><summary>'+esc(t("received"))+' ('+done.length+')</summary>' + done.map(function(d){
+        return '<div class="row"><span class="grow">'+esc(d.label)+'</span><span class="pill '+(d.status==="verified"?"p-good":"p-info")+'">'+esc(t(d.status))+'</span></div>';
+      }).join("") + '</details>';
+    }
+  }
+  h += '</div>';
+
+  if(data.invoices.length){
+    h += '<div class="card"><h2>'+esc(t("pay"))+'</h2>';
+    data.invoices.forEach(function(i){
+      var pill = {pending:"p-warn",paid:"p-good",refunded:"p-info"}[i.status] || "p-muted";
+      h += '<div class="row" style="flex-wrap:wrap"><div class="grow"><b>'+esc(i.description)+'</b><div class="mono">'+som(i.amount_uzs)+'</div></div><span class="pill '+pill+'">'+esc(t(i.status)||i.status)+'</span>';
+      if(i.status==="pending"){
+        var links = [];
+        if(i.pay && i.pay.click) links.push('<a class="btn btn-primary" href="'+esc(i.pay.click)+'" rel="noopener">'+esc(t("payWith"))+' Click</a>');
+        if(i.pay && i.pay.payme) links.push('<a class="btn btn-primary" href="'+esc(i.pay.payme)+'" rel="noopener">'+esc(t("payWith"))+' Payme</a>');
+        h += '<div class="pay" style="width:100%">'+(links.length ? links.join("") : '<span class="faint" style="font-size:13px">'+esc(t("noPay"))+'</span>')+'</div>';
+      }
+      h += '</div>';
+    });
+    h += '</div>';
+  }
+
+  h += '<div class="card"><h2>'+esc(t("news"))+'</h2>' + (data.events.length ? data.events.map(function(e){
+    return '<div class="ev"><span class="faint" style="font-size:12px">'+fmtDate(e.created_at)+'</span><br>'+esc(e.message)+'</div>';
+  }).join("") : '<div class="faint">'+esc(t("none"))+'</div>') + '</div>';
+
+  if(data.agent){
+    h += '<div class="card"><h2>'+esc(t("agent"))+'</h2><b>'+esc(data.agent.name)+'</b>'+(data.agent.phone?'<div><a href="tel:'+esc(data.agent.phone)+'">'+esc(data.agent.phone)+'</a></div>':'')+'</div>';
+  }
+  el.innerHTML = h;
+}
+
+document.getElementById("langs").addEventListener("click", function(e){
+  var b = e.target.closest("[data-l]"); if(!b) return;
+  lang = b.dataset.l; try{ localStorage.setItem("wh_lang", lang); }catch(err){}
+  render();
+});
+
+if(!token){ render(); return; }
+fetch("/api/parent/"+encodeURIComponent(token)).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){ data = j; render(); }).catch(function(){ render(); });
+})();
+</script>
+</body>
+</html>

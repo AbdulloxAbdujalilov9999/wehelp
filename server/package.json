@@ -1,0 +1,20 @@
+{
+  "name": "wehelp-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WeHelp backend: accounts, agency board, parent view, Click/Payme payments, Telegram reminders",
+  "type": "commonjs",
+  "main": "src/index.js",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node src/index.js",
+    "migrate": "node src/cli.js migrate",
+    "create-admin": "node src/cli.js create-admin",
+    "remind": "node src/cli.js remind",
+    "test": "node --test --test-concurrency=1 test/*.test.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "pg": "^8.16.0"
+  }
+}

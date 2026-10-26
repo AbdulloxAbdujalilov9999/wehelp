@@ -1,0 +1,202 @@
+[
+  {
+    "id": "seoul-national-university",
+    "name": "Seoul National University",
+    "city": "Seoul",
+    "country": "South Korea",
+    "deadline_note": "September (fall round)",
+    "intake": "March & September",
+    "apply_url": "en.snu.ac.kr",
+    "language": "English or Korean (TOPIK 3+)"
+  },
+  {
+    "id": "kaist",
+    "name": "KAIST",
+    "city": "Daejeon",
+    "country": "South Korea",
+    "deadline_note": "Varies by round",
+    "intake": "March & September",
+    "apply_url": "admission.kaist.ac.kr",
+    "language": "English"
+  },
+  {
+    "id": "korea-university",
+    "name": "Korea University",
+    "city": "Seoul",
+    "country": "South Korea",
+    "deadline_note": "September (fall round)",
+    "intake": "March & September",
+    "apply_url": "oia.korea.ac.kr",
+    "language": "English or Korean"
+  },
+  {
+    "id": "yonsei-university",
+    "name": "Yonsei University",
+    "city": "Seoul",
+    "country": "South Korea",
+    "deadline_note": "September, two rounds",
+    "intake": "March & September",
+    "apply_url": "oia.yonsei.ac.kr",
+    "language": "English (Underwood International College)"
+  },
+  {
+    "id": "postech",
+    "name": "POSTECH",
+    "city": "Pohang",
+    "country": "South Korea",
+    "deadline_note": "September–November (international track)",
+    "intake": "September",
+    "apply_url": "adm-iu.postech.ac.kr",
+    "language": "English"
+  },
+  {
+    "id": "skku",
+    "name": "Sungkyunkwan University",
+    "city": "Seoul",
+    "country": "South Korea",
+    "deadline_note": "September (fall round)",
+    "intake": "March & September",
+    "apply_url": "admission-global.skku.edu",
+    "language": "English or Korean (TOPIK 4+)"
+  },
+  {
+    "id": "hanyang-university",
+    "name": "Hanyang University",
+    "city": "Seoul",
+    "country": "South Korea",
+    "deadline_note": "Rolling, two rounds",
+    "intake": "March & September",
+    "apply_url": "oia.hanyang.ac.kr",
+    "language": "English or Korean"
+  },
+  {
+    "id": "unist",
+    "name": "UNIST",
+    "city": "Ulsan",
+    "country": "South Korea",
+    "deadline_note": "Rolling, two rounds",
+    "intake": "March & September",
+    "apply_url": "admu-intl.unist.ac.kr",
+    "language": "100% English-taught"
+  },
+  {
+    "id": "kyung-hee-university",
+    "name": "Kyung Hee University",
+    "city": "Seoul",
+    "country": "South Korea",
+    "deadline_note": "September (fall round)",
+    "intake": "March & September",
+    "apply_url": "khu.ac.kr",
+    "language": "English or Korean (TOPIK 4+)"
+  },
+  {
+    "id": "ewha-womans-university",
+    "name": "Ewha Womans University",
+    "city": "Seoul",
+    "country": "South Korea",
+    "deadline_note": "September (fall round)",
+    "intake": "March & September",
+    "apply_url": "admission.ewha.ac.kr",
+    "language": "English or Korean (TOPIK 3+)"
+  },
+  {
+    "id": "sogang-university",
+    "name": "Sogang University",
+    "city": "Seoul",
+    "country": "South Korea",
+    "deadline_note": "September (fall round)",
+    "intake": "March & September",
+    "apply_url": "sogang.ac.kr",
+    "language": "English or Korean"
+  },
+  {
+    "id": "chung-ang-university",
+    "name": "Chung-Ang University",
+    "city": "Seoul",
+    "country": "South Korea",
+    "deadline_note": "September (fall round)",
+    "intake": "March & September",
+    "apply_url": "cau.ac.kr",
+    "language": "English or Korean"
+  },
+  {
+    "id": "gist",
+    "name": "GIST",
+    "city": "Gwangju",
+    "country": "South Korea",
+    "deadline_note": "Rolling",
+    "intake": "September",
+    "apply_url": "gist.ac.kr",
+    "language": "100% English-taught"
+  },
+  {
+    "id": "pusan-national-university",
+    "name": "Pusan National University",
+    "city": "Busan",
+    "country": "South Korea",
+    "deadline_note": "GKS: September prior year · self-funded: rolling",
+    "intake": "March & September",
+    "apply_url": "pusan.ac.kr",
+    "language": "English or Korean"
+  },
+  {
+    "id": "konkuk-university",
+    "name": "Konkuk University",
+    "city": "Seoul",
+    "country": "South Korea",
+    "deadline_note": "September (fall round)",
+    "intake": "March & September",
+    "apply_url": "konkuk.ac.kr",
+    "language": "English or Korean"
+  },
+  {
+    "id": "dongguk-university",
+    "name": "Dongguk University",
+    "city": "Seoul",
+    "country": "South Korea",
+    "deadline_note": "September (fall round)",
+    "intake": "March & September",
+    "apply_url": "dongguk.edu",
+    "language": "English or Korean"
+  },
+  {
+    "id": "kookmin-university",
+    "name": "Kookmin University",
+    "city": "Seoul",
+    "country": "South Korea",
+    "deadline_note": "September (fall round)",
+    "intake": "March & September",
+    "apply_url": "english.kookmin.ac.kr",
+    "language": "English or Korean (TOPIK required for most majors)"
+  },
+  {
+    "id": "ajou-university",
+    "name": "Ajou University",
+    "city": "Suwon",
+    "country": "South Korea",
+    "deadline_note": "September (fall round)",
+    "intake": "March & September",
+    "apply_url": "ajou.ac.kr",
+    "language": "English or Korean (TOPIK 3+)"
+  },
+  {
+    "id": "inha-university",
+    "name": "Inha University",
+    "city": "Incheon",
+    "country": "South Korea",
+    "deadline_note": "September (fall round)",
+    "intake": "March & September",
+    "apply_url": "inha.ac.kr",
+    "language": "English or Korean"
+  },
+  {
+    "id": "hongik-university",
+    "name": "Hongik University",
+    "city": "Seoul",
+    "country": "South Korea",
+    "deadline_note": "September (fall round), portfolio deadlines earlier",
+    "intake": "March & September",
+    "apply_url": "hongik.ac.kr",
+    "language": "English or Korean"
+  }
+]
