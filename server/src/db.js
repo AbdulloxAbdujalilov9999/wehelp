@@ -13,10 +13,21 @@ function getPool() {
   if (!pool) {
     const url = process.env.DATABASE_URL;
     if (!url) throw new Error("DATABASE_URL is not set");
-    const ssl = /sslmode=require/.test(url) || process.env.PGSSL === "1" ? { rejectUnauthorized: false } : undefined;
+    const ssl = /sslmode=require/.test(url) || /supabase\.(com|co)\b/.test(url) || process.env.PGSSL === "1" ? { rejectUnauthorized: false } : undefined;
     pool = new Pool({ connectionString: url, ssl, max: 10 });
+    // DB_SCHEMA keeps UniSprint's tables in their own schema when the database
+    // is shared with another app (e.g. a Supabase project). Use a session-mode
+    // connection (Supabase's session pooler on port 5432), not transaction mode.
+    const schema = dbSchema();
+    if (schema) pool.on("connect", (client) => client.query(`SET search_path TO "${schema}"`).catch((e) => console.error("[db] search_path:", e.message)));
   }
   return pool;
+}
+
+function dbSchema() {
+  const s = (process.env.DB_SCHEMA || "").trim();
+  if (s && !/^[a-z_][a-z0-9_]{0,62}$/.test(s)) throw new Error("DB_SCHEMA must be a lowercase identifier");
+  return s || null;
 }
 
 function query(text, params) {
@@ -49,6 +60,11 @@ async function tx(fn) {
 }
 
 async function migrate() {
+  const schema = dbSchema();
+  if (schema) {
+    await query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`);
+    await query(`SET search_path TO "${schema}"`); // this pooled client may predate the schema
+  }
   await query("CREATE TABLE IF NOT EXISTS schema_migrations (name TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now())");
   const dir = path.join(__dirname, "..", "migrations");
   const files = fs.readdirSync(dir).filter((f) => f.endsWith(".sql")).sort();

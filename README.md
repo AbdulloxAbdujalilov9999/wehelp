@@ -59,6 +59,7 @@ TEST_DATABASE_URL=postgres://postgres@localhost/unisprint_test npm test
 | Variable | Needed for |
 |---|---|
 | `DATABASE_URL` | Always |
+| `DB_SCHEMA` | Optional. Keeps the tables in their own schema in a shared database, e.g. `agency` in a Supabase project. Needs a session-mode connection (Supabase session pooler, port 5432). |
 | `CONTACT_TELEGRAM`, `CONTACT_PHONE`, `CONTACT_INSTAGRAM` | Contacts on the sales page |
 | `PUBLIC_URL` | Payment return links, e.g. `https://unisprint.uz` |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME` | Telegram. Create the bot with @BotFather. |

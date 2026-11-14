@@ -1,12 +1,14 @@
-# Render blueprint: one Node web service. The database is not created here:
-# point DATABASE_URL at a durable Postgres (a paid Render database, or a new
-# database inside one you already pay for). Render's free Postgres is deleted
+# Render blueprint: one Node web service. The database is not created here.
+# Production uses the Supabase project "qabul-admissions" (Mumbai), with
+# UniSprint's tables in their own schema (DB_SCHEMA=agency). DATABASE_URL is the
+# Supabase *session pooler* URI (port 5432): Render has no IPv6, so the direct
+# db.<ref>.supabase.co address does not work. Render's free Postgres is deleted
 # after 30 days, so it must not hold real students.
 services:
   - type: web
     name: unisprint-apply
     runtime: node
-    region: oregon
+    region: singapore
     plan: free
     rootDir: server
     buildCommand: npm ci
@@ -17,6 +19,8 @@ services:
         value: production
       - key: DATABASE_URL
         sync: false
+      - key: DB_SCHEMA
+        value: agency
       - key: PUBLIC_URL
         sync: false
       - key: CONTACT_TELEGRAM
