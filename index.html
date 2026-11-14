@@ -1,4 +1,4 @@
-<title>WeHelp</title>
+<title>UniSprint</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -261,14 +261,27 @@ body.sidebar-open .sidebar{transform:translateX(0)}
 footer.site{padding:30px 0 10px;text-align:center}
 footer.site p{font-size:12px;color:var(--faint);max-width:520px;margin:0 auto}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+/* ---------- Account, progress, help ---------- */
+.auth-btn{font-size:12.5px;font-weight:700;color:var(--muted);background:none;border:1px dashed var(--line);border-radius:999px;padding:7px 10px;cursor:pointer;width:100%}
+.auth-btn:hover{border-color:var(--accent);color:var(--ink)}
+.auth-card{max-width:420px;padding:22px;display:flex;flex-direction:column;gap:12px}
+.form-err{color:var(--bad);font-size:12.5px;min-height:1em}
+.steps-v{list-style:none;margin:14px 0 0;padding:0}
+.steps-v li{display:flex;gap:12px;align-items:center;padding:6px 0;color:var(--faint)}
+.steps-v li .d{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+.steps-v li.done{color:var(--ink)} .steps-v li.done .d{background:var(--good);border-color:var(--good);color:#fff}
+.steps-v li.now{color:var(--accent);font-weight:700} .steps-v li.now .d{border-color:var(--accent);background:var(--accent-soft)}
+.visa-flag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px}
+.check-result{margin-top:10px;display:flex;flex-direction:column;gap:6px}
 </style>
 
 <button class="sidebar-toggle-float" id="sidebarFloatBtn" aria-label="Open menu">☰</button>
 <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-head">
-    <button class="brand" data-go="home" aria-label="WeHelp home">
-      <span class="mark">W</span><span class="word">WeHelp</span>
+    <button class="brand" data-go="home" aria-label="UniSprint home">
+      <span class="mark">U</span><span class="word">UniSprint</span>
     </button>
     <button class="sidebar-toggle-inline" id="sidebarCloseBtn" aria-label="Close menu">✕</button>
   </div>
@@ -279,6 +292,8 @@ footer.site p{font-size:12px;color:var(--faint);max-width:520px;margin:0 auto}
     <button data-go="profile">My Profile</button>
     <button data-go="applications">My Colleges</button>
     <button data-go="resources">Resources</button>
+    <button data-go="progress" id="navProgress" class="hide">My UniSprint progress</button>
+    <button data-go="help">Get help applying</button>
   </nav>
   <div class="sidebar-foot">
     <button class="sidebar-user" data-go="profile" id="sidebarUser">
@@ -286,6 +301,7 @@ footer.site p{font-size:12px;color:var(--faint);max-width:520px;margin:0 auto}
       <span class="sidebar-user-text"><b id="sidebarUserName">—</b><span id="sidebarUserSub">0% of profile done</span></span>
     </button>
     <button class="nav-count" data-go="applications" id="appsChip">⚑ <b id="appsCount">0</b> colleges</button>
+    <button class="auth-btn hide" id="authBtn" data-go="signin">Sign in to UniSprint</button>
   </div>
 </aside>
 
@@ -293,7 +309,7 @@ footer.site p{font-size:12px;color:var(--faint);max-width:520px;margin:0 auto}
   <div id="app" class="wrap"></div>
 
   <footer class="site">
-    <p>University figures (tuition, rankings, requirements) are compiled from public sources and should be verified before advising a student. No data leaves this browser — everything here is saved locally, with no backend yet.</p>
+    <p>University figures (tuition, rankings, requirements) are compiled from public sources and should be verified before advising a student. <span id="saveNote">No data leaves this browser — everything here is saved locally.</span></p>
   </footer>
 </div>
 <div class="save-toast" id="toast">Saved</div>
@@ -623,7 +639,7 @@ var STATUS_META = {
 var STEP_LABELS = ["Draft","Submitted","Under Review","Decision"];
 
 /* ===================== STATE ===================== */
-var LS_PROFILE = "wehelp_profile_v1", LS_SHORTLIST = "wehelp_shortlist_v1", LS_APPS = "wehelp_apps_v1";
+var LS_PROFILE = "unisprint_profile_v1", LS_SHORTLIST = "unisprint_shortlist_v1", LS_APPS = "unisprint_apps_v1";
 
 function uid(){ return "a" + Math.random().toString(36).slice(2,9); }
 
@@ -638,20 +654,8 @@ function safeSet(key, val){
 var ACTIVITY_CATEGORIES = ["Academic club","Athletics","Community service","Family responsibilities","Internship / work","Music or art","Olympiad / competition","Research","Student government","Other"];
 
 var defaultProfile = {
-  firstName:"Aruzhan", lastName:"Tulegenova", email:"aruzhan.t@example.com", phone:"+7 701 234 5678",
-  country:"Kazakhstan", city:"Almaty", school:"NIS Physics & Math, Almaty", gradYear:"2026",
-  gpa:"3.8", gpaScale:"4.0", ielts:"7.0", sat:"1420",
-  statement:"I want to study computer science somewhere I can also keep competing in math olympiads. Draft — needs a stronger opening line.",
-  documents:{ passport:{name:"passport_scan.pdf"}, transcript:{name:"transcript_10_11.pdf"}, recommendation:null, photo:{name:"id_photo.jpg"} },
-  activities:[
-    {id:"act1", category:"Olympiad / competition", role:"Team captain", org:"Republican Math Olympiad", hours:"6", weeks:"20", grades:"10, 11", description:"Placed 2nd nationally in 2025; now coach three juniors weekly."},
-    {id:"act2", category:"Research", role:"Student researcher", org:"NIS Almaty robotics lab", hours:"4", weeks:"30", grades:"11", description:"Built a line-following robot for a school open-day demo."},
-    {id:"act3", category:"Community service", role:"Volunteer tutor", org:"Local community center", hours:"3", weeks:"15", grades:"10, 11", description:"Tutor younger students in algebra every weekend."}
-  ],
-  recommenders:[
-    {id:"rec1", name:"Madina Serikova", role:"Math teacher", email:"m.serikova@nis-almaty.example", status:"submitted"},
-    {id:"rec2", name:"Yerlan Abenov", role:"School counselor", email:"y.abenov@nis-almaty.example", status:"invited"}
-  ]
+  firstName:"", lastName:"", email:"", phone:"", country:"Uzbekistan", city:"", school:"", gradYear:"",
+  gpa:"", gpaScale:"4.0", ielts:"", sat:"", statement:"", documents:{}, activities:[], recommenders:[]
 };
 
 var state = {
@@ -664,24 +668,96 @@ var state = {
   menuOpen:false
 };
 
-if(!state.apps){
-  var now = Date.now(), day = 86400000;
-  state.apps = [
-    {id:uid(), uniId:"seoul-national-university", status:"admitted", program:"Computer Science", createdAt:now-40*day, updatedAt:now-5*day,
-      supplementAnswer:"SNU's systems lab is doing exactly the distributed-systems research I want to build a career on.",
-      history:[["Draft",now-40*day],["Submitted",now-33*day],["Under Review",now-20*day],["Admitted",now-5*day]]},
-    {id:uid(), uniId:"korea-university", status:"review", program:"Computer Science", createdAt:now-18*day, updatedAt:now-3*day,
-      history:[["Draft",now-18*day],["Submitted",now-12*day],["Under Review",now-3*day]]},
-    {id:uid(), uniId:"kaist", status:"submitted", program:"Computer Science", createdAt:now-6*day, updatedAt:now-6*day,
-      supplementAnswer:"I built a line-following robot in high school and want to push into reinforcement learning next.",
-      history:[["Draft",now-6*day],["Submitted",now-6*day]]}
-  ];
-  safeSet(LS_APPS, state.apps);
-}
+if(!state.apps) state.apps = [];
 
-function saveProfile(){ safeSet(LS_PROFILE, state.profile); toast("Profile saved"); }
-function saveShortlist(){ safeSet(LS_SHORTLIST, state.shortlist); }
-function saveApps(){ safeSet(LS_APPS, state.apps); }
+function saveProfile(){ safeSet(LS_PROFILE, state.profile); toast("Profile saved"); scheduleSync(); }
+function saveShortlist(){ safeSet(LS_SHORTLIST, state.shortlist); scheduleSync(); }
+function saveApps(){ safeSet(LS_APPS, state.apps); scheduleSync(); }
+
+/* ===================== WEHELP ACCOUNT (optional backend) =====================
+   Opened as a plain file, the site works offline as before. Served by the
+   UniSprint server, students can sign in and their profile, shortlist and
+   applications are saved to their account, where the agency can see them. */
+var server = { online:false, user:null, flags:{}, progress:null };
+var syncTimer = null;
+function api(method, path, body){
+  var opts = {method:method, headers:{}, credentials:"same-origin"};
+  if(body !== undefined){ opts.headers["content-type"] = "application/json"; opts.body = JSON.stringify(body); }
+  return fetch(path, opts).then(function(r){
+    return r.json().catch(function(){ return {}; }).then(function(j){
+      if(!r.ok){ var e = new Error(j.error || ("Error " + r.status)); e.status = r.status; throw e; }
+      return j;
+    });
+  });
+}
+function isStudent(){ return !!(server.user && server.user.role === "student"); }
+function scheduleSync(){
+  if(!isStudent()) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(function(){
+    api("PUT", "/api/me/state", {state:{profile:state.profile, shortlist:state.shortlist, apps:state.apps}})
+      .catch(function(){ toast("Saved on this device. Will retry online."); });
+  }, 800);
+}
+function blankProfile(u){
+  var parts = (u.name || "").split(" ");
+  return {firstName:parts[0]||"", lastName:parts.slice(1).join(" "), email:u.email||"", phone:u.phone||"", country:"Uzbekistan", city:"", school:"", gradYear:"",
+    gpa:"", gpaScale:"4.0", ielts:"", sat:"", statement:"", documents:{}, activities:[], recommenders:[]};
+}
+function startAccount(){
+  if(!/^https?:/.test(location.protocol)) return;
+  api("GET", "/api/universities?all=1").then(function(r){
+    server.online = true;
+    r.universities.forEach(function(u){ server.flags[u.id] = u; });
+    document.getElementById("authBtn").classList.remove("hide");
+    render();
+  }).catch(function(){});
+  api("GET", "/api/auth/me").then(function(r){
+    if(!r.user) return;
+    server.user = r.user;
+    if(r.user.role !== "student"){ updateAuthUi(); return; }
+    return api("GET", "/api/me/state").then(function(s){
+      if(s.state){
+        state.profile = s.state.profile && Object.keys(s.state.profile).length ? s.state.profile : blankProfile(r.user);
+        state.shortlist = s.state.shortlist || [];
+        state.apps = s.state.apps || [];
+      } else {
+        // First sign-in: start clean instead of uploading the demo profile.
+        state.profile = blankProfile(r.user);
+        state.apps = [];
+        scheduleSync();
+      }
+      safeSet(LS_PROFILE, state.profile); safeSet(LS_SHORTLIST, state.shortlist); safeSet(LS_APPS, state.apps);
+      updateAuthUi(); render();
+    });
+  }).catch(function(){});
+}
+function updateAuthUi(){
+  var b = document.getElementById("authBtn");
+  document.getElementById("navProgress").classList.toggle("hide", !isStudent());
+  if(server.user){
+    b.textContent = "Sign out (" + server.user.email + ")";
+    b.removeAttribute("data-go");
+    b.onclick = function(){ api("POST", "/api/auth/logout", {}).then(function(){ location.hash = "#home"; location.reload(); }); };
+    document.getElementById("saveNote").textContent = "Signed in: your profile and colleges are saved to your UniSprint account.";
+  }
+  if(server.user && server.user.role !== "student"){
+    b.textContent = "Open agency board"; b.onclick = function(){ location.href = "/agency"; };
+  }
+}
+/* Visa status from Korea's IEQAS certification, as tracked by the UniSprint team. */
+function visaFlagHtml(id){
+  var f = server.flags[id];
+  if(!f) return "";
+  if(f.restricted_degree || f.restricted_language){
+    var which = f.restricted_degree && f.restricted_language ? "" : (f.restricted_degree ? " (degree)" : " (language)");
+    return '<span class="visa-flag" style="background:var(--bad-soft);color:var(--bad)" title="'+esc(f.ieqas_note||"")+'">⚠ Visa restricted'+which+'</span>';
+  }
+  if(f.ieqas_status === "excellent") return '<span class="visa-flag" style="background:var(--good-soft);color:var(--good)">✓ IEQAS excellent</span>';
+  if(f.ieqas_status === "certified") return '<span class="visa-flag" style="background:var(--good-soft);color:var(--good)">✓ IEQAS certified</span>';
+  if(f.ieqas_status === "not_certified") return '<span class="visa-flag" style="background:var(--warn-soft);color:var(--warn)">Not IEQAS certified</span>';
+  return "";
+}
 
 var toastTimer = null;
 function toast(msg){
@@ -739,7 +815,7 @@ function parseHash(){
   if(!h) return {view:"home"};
   if(h.indexOf("uni-")===0) return {view:"uni", id:h.slice(4)};
   if(h.indexOf("apply-")===0) return {view:"apply", id:h.slice(6)};
-  if(["home","dashboard","explore","compare","profile","applications","resources"].indexOf(h)>-1) return {view:h};
+  if(["home","dashboard","explore","compare","profile","applications","resources","signin","progress","help"].indexOf(h)>-1) return {view:h};
   return {view:"home"};
 }
 function go(hash){ location.hash = "#"+hash; }
@@ -800,7 +876,7 @@ function renderHome(){
     '<div>' +
       '<div class="eyebrow">'+greeting()+', '+esc(state.profile.firstName||"there")+'</div>' +
       '<h1>Build your profile once.<br><em>Apply</em> everywhere that fits.</h1>' +
-      '<p class="lede">WeHelp is the Common App for Central Asian students applying to Korea — one academic profile, a researched shortlist of '+UNIS.length+' Korean universities across '+cityCount+' cities, and an agency team behind the screen when you get stuck.</p>' +
+      '<p class="lede">UniSprint is the Common App for Central Asian students applying to Korea — one academic profile, a researched shortlist of '+UNIS.length+' Korean universities across '+cityCount+' cities, and an agency team behind the screen when you get stuck.</p>' +
       '<div class="hero-actions">' +
         '<button class="btn btn-primary" data-go="profile">Start my profile</button>' +
         '<button class="btn btn-ghost" data-go="explore">Explore universities</button>' +
@@ -845,13 +921,8 @@ function renderHome(){
       '<div>' +
         '<div class="eyebrow">Behind the platform</div>' +
         '<h2 style="margin:6px 0 10px;font-size:22px">A human advisor, not just a form</h2>' +
-        '<p style="color:var(--muted);margin:0 0 14px;max-width:48ch">WeHelp is built by an agency team, not just software — book a free call and we\'ll sanity-check your shortlist before you file anything.</p>' +
-        '<button class="btn btn-primary" id="bookCallBtn">Book a free consultation</button>' +
-      '</div>' +
-      '<div>' +
-        '<div class="hint" style="margin-bottom:6px">Placeholder contact — swap for your real handles</div>' +
-        '<div class="contact-chip"><span>@wehelp_admissions</span><button class="copybtn" data-copy="@wehelp_admissions">Copy</button></div>' +
-        '<div class="contact-chip"><span>+7 700 000 00 00</span><button class="copybtn" data-copy="+7 700 000 00 00">Copy</button></div>' +
+        '<p style="color:var(--muted);margin:0 0 14px;max-width:48ch">UniSprint is run by an agency team, not just software. Book a free consultation and we\'ll check your shortlist and each school\'s visa status before you file anything. Or let us do the whole application for you.</p>' +
+        '<a class="btn btn-primary" href="/#ariza">Book a free consultation</a> <a class="btn btn-ghost" href="/#narxlar">See done-for-you packages</a>' +
       '</div>' +
     '</div>' +
   '</section>';
@@ -864,7 +935,7 @@ function uniCardHtml(u){
       '<div><div class="uni-name">'+esc(u.name)+'</div><div class="uni-loc">'+esc(u.city)+', '+esc(u.country)+'</div></div>' +
       '<button class="star-btn'+(starred?' on':'')+'" data-star="'+u.id+'" title="Shortlist" aria-label="Toggle shortlist">★</button>' +
     '</div>' +
-    '<div class="taglist"><span class="tag">'+esc(u.highlight)+'</span>'+(u.scholarship?pillHtml("Scholarship","good"):'')+'</div>' +
+    '<div class="taglist"><span class="tag">'+esc(u.highlight)+'</span>'+(u.scholarship?pillHtml("Scholarship","good"):'')+visaFlagHtml(u.id)+'</div>' +
     '<div class="uni-stats">' +
       '<div>Rank<b>'+esc(u.rank.split(" · ")[0])+'</b></div>' +
       '<div>Tuition/yr<b>'+fmtUSD(u.tuitionUSD)+'</b></div>' +
@@ -936,6 +1007,7 @@ function renderUniDetail(id){
       '<div class="kv-item"><div class="l">Selectivity</div><div class="v" style="font-size:14px">'+esc(u.selectivity)+'</div></div>' +
       '<div class="kv-item"><div class="l">Next intake</div><div class="v" style="font-size:14px">'+esc(u.intake)+'</div></div>' +
     '</div>' +
+    (server.flags[u.id] ? '<div class="kv-item" style="margin-top:12px"><div class="l">Korean visa status (IEQAS)</div><div class="v" style="font-size:13px">'+(visaFlagHtml(u.id)||"Not checked by UniSprint yet")+(server.flags[u.id].ieqas_checked_at?' <span class="hint">checked '+esc(server.flags[u.id].ieqas_checked_at)+'</span>':'')+'</div></div>' : '') +
     '<a class="official-link" href="https://'+esc(u.applyUrl)+'" target="_blank" rel="noopener">Official admissions site ↗<span>'+esc(u.applyUrl)+'</span></a>' +
     '<p class="hint" style="margin-top:14px">Figures compiled from public sources — some faculties set their own thresholds. Confirm before advising a student.</p>';
   } else if(detailTab==="cost"){
@@ -1189,7 +1261,7 @@ function appStubHtml(a){
         '<span class="hint">Last update '+daysAgo(a.updatedAt)+'</span>' +
         '<button class="btn btn-ghost btn-sm" data-go="uni-'+a.uniId+'">View school</button>' +
       '</div>' +
-      '<div class="demo-control"><label for="statusSel_'+a.id+'">For this walkthrough — jump to stage:</label>' +
+      '<div class="demo-control"><label for="statusSel_'+a.id+'">Update the status yourself:</label>' +
         '<select id="statusSel_'+a.id+'" data-status-select="'+a.id+'">'+statusOptions+'</select>' +
       '</div>' +
     '</div>' +
@@ -1261,7 +1333,7 @@ function renderApply(id){
     '<div class="check-row"><div class="check-mark ok">✓</div><div><div style="font-weight:600;font-size:13.5px">Personal statement</div><div class="hint">'+esc((p.statement||"").slice(0,70))+(p.statement && p.statement.length>70 ? "…" : "")+'</div></div></div>' +
     '<div class="check-row"><div class="check-mark ok">✓</div><div><div style="font-weight:600;font-size:13.5px">School supplement</div><div class="hint">'+esc(reviewSup.slice(0,70))+(reviewSup.length>70?"…":"")+'</div></div></div>' +
     '<a class="official-link" href="https://'+esc(u.applyUrl)+'" target="_blank" rel="noopener">Cross-check on the official site ↗<span>'+esc(u.applyUrl)+'</span></a>' +
-    '<p class="hint" style="margin-top:14px">Submitting creates a tracked application on your My Colleges page with a full draft → submitted → under review → decision timeline. There\'s no backend yet, so nothing is actually sent to the university — use the official site link above for the real submission.</p>';
+    '<p class="hint" style="margin-top:14px">Submitting creates a tracked application on your My Colleges page with a full draft → submitted → under review → decision timeline. This tracker does not send anything to the university. Submit on the official site above, or ask a UniSprint manager to apply for you.</p>';
   }
 
   return '<section class="section" style="padding-top:28px;max-width:640px;margin:0 auto">' +
@@ -1281,7 +1353,7 @@ function renderApply(id){
 function renderResources(){
   return '<section class="section" style="padding-top:28px">' +
     '<div class="eyebrow">Resources</div><h2 style="margin:4px 0 6px;font-size:26px">The lessons behind the applications</h2>' +
-    '<p class="hint" style="max-width:56ch;margin-bottom:20px">Early drafts of the course content that will eventually live inside WeHelp — IELTS, essays, visas and scholarships, written for this exact shortlist of universities.</p>' +
+    '<p class="hint" style="max-width:56ch;margin-bottom:20px">Early drafts of the course content that will eventually live inside UniSprint — IELTS, essays, visas and scholarships, written for this exact shortlist of universities.</p>' +
     '<div class="grid-cards">' +
       RESOURCES.map(function(r){
         return '<div class="card res-card"><span class="pill res-tag" style="background:var(--info-soft);color:var(--info)">'+esc(r.tag)+'</span>' +
@@ -1290,6 +1362,125 @@ function renderResources(){
       }).join("") +
     '</div>' +
   '</section>';
+}
+
+/* ===================== RENDER: ACCOUNT, PROGRESS, HELP ===================== */
+function renderSignin(){
+  if(!server.online) return '<section class="section" style="padding-top:28px"><h2>Sign in</h2><p class="hint">Accounts work when this site is opened from the UniSprint server.</p></section>';
+  if(server.user) return '<section class="section" style="padding-top:28px"><h2>You are signed in</h2><p class="hint">'+esc(server.user.email)+'</p><button class="btn btn-primary" data-go="dashboard">Go to dashboard</button></section>';
+  return '<section class="section" style="padding-top:28px">' +
+    '<div class="eyebrow">UniSprint account</div><h2 style="margin:4px 0 16px;font-size:26px">Save your applications to UniSprint</h2>' +
+    '<div class="grid-cards" style="grid-template-columns:repeat(auto-fit,minmax(280px,420px))">' +
+      '<form class="card auth-card" id="signinForm"><h3 style="margin:0;font-family:\'Fraunces\',serif">Sign in</h3>' +
+        '<div class="field"><label for="siEmail">Email</label><input id="siEmail" type="email" required autocomplete="username"></div>' +
+        '<div class="field"><label for="siPass">Password</label><input id="siPass" type="password" required autocomplete="current-password"></div>' +
+        '<div class="form-err" id="siErr"></div><button class="btn btn-primary">Sign in</button></form>' +
+      '<form class="card auth-card" id="registerForm"><h3 style="margin:0;font-family:\'Fraunces\',serif">New here? Use your invite code</h3>' +
+        '<p class="hint" style="margin:0">Your UniSprint manager gives you an 8-letter code after your first meeting.</p>' +
+        '<div class="field"><label for="rgCode">Invite code</label><input id="rgCode" type="text" required autocomplete="off" style="text-transform:uppercase"></div>' +
+        '<div class="field"><label for="rgEmail">Email</label><input id="rgEmail" type="email" required autocomplete="username"></div>' +
+        '<div class="field"><label for="rgPass">Password (8+ characters)</label><input id="rgPass" type="password" minlength="8" required autocomplete="new-password"></div>' +
+        '<div class="form-err" id="rgErr"></div><button class="btn btn-primary">Create account</button></form>' +
+    '</div></section>';
+}
+
+function renderProgress(){
+  if(!isStudent()) return renderSignin();
+  var p = server.progress;
+  if(!p){
+    api("GET", "/api/me/progress").then(function(r){ server.progress = r; if(parseHash().view==="progress") render(); }).catch(function(e){ toast(e.message); });
+    return '<section class="section"><p class="hint">Loading…</p></section>';
+  }
+  server.progress = null; // refetch next time this view opens
+  var docs = p.documents, ready = docs.filter(function(d){ return d.status!=="missing"; }).length;
+  var labels = {draft:"Preparing",submitted:"Submitted",review:"Under review",admitted:"Admitted",waitlisted:"Waitlisted",declined:"Not admitted"};
+  var colors = {draft:"muted",submitted:"info",review:"warn",admitted:"good",waitlisted:"warn",declined:"bad"};
+  return '<section class="section" style="padding-top:28px">' +
+    '<div class="eyebrow">Managed by UniSprint</div><h2 style="margin:4px 0 6px;font-size:26px">Your progress</h2>' +
+    '<p class="hint">These are the applications your UniSprint manager is handling for you'+(p.agent?' ('+esc(p.agent.name)+(p.agent.phone?', '+esc(p.agent.phone):'')+')':'')+'.</p>' +
+    '<div class="grid-cards" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:16px">' +
+      '<div class="card" style="padding:18px"><h3 style="margin:0;font-family:\'Fraunces\',serif">Stage</h3><ol class="steps-v">' +
+        p.stages.map(function(st,i){ var c = i < p.student.stage_index ? "done" : (i===p.student.stage_index ? "now" : ""); return '<li class="'+c+'"><span class="d">'+(c==="done"?"✓":i+1)+'</span>'+esc(st.en)+'</li>'; }).join("") +
+      '</ol><button class="btn btn-ghost btn-sm" id="tgLinkBtn" style="margin-top:12px">'+(server.user.telegram_linked?"Telegram reminders on ✓":"Get deadline reminders on Telegram")+'</button></div>' +
+      '<div class="card" style="padding:18px"><h3 style="margin:0 0 10px;font-family:\'Fraunces\',serif">Universities</h3>' +
+        (p.applications.length ? p.applications.map(function(a){ return '<div class="check-row"><div style="flex:1"><b>'+esc(a.university)+'</b><div class="hint">'+esc(a.program||"")+(a.deadline?' · deadline '+esc(a.deadline):'')+'</div>'+(a.restriction?'<div class="hint" style="color:var(--bad)">⚠ '+esc(a.restriction)+'</div>':'')+'</div>'+pillHtml(labels[a.status], colors[a.status])+'</div>'; }).join("") : '<p class="hint">None yet.</p>') +
+      '</div>' +
+      '<div class="card" style="padding:18px"><h3 style="margin:0 0 6px;font-family:\'Fraunces\',serif">Documents</h3>' +
+        (docs.length ? '<p class="hint" style="margin:0 0 6px">'+ready+' of '+docs.length+' ready</p><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(ready/docs.length*100)+'%"></div></div>' +
+          docs.filter(function(d){ return d.status==="missing"; }).map(function(d){ return '<div class="check-row"><span class="check-mark bad"></span><div style="flex:1">'+esc(d.label)+(d.due_date?'<div class="hint">due '+esc(d.due_date)+'</div>':'')+'</div></div>'; }).join("") : '<p class="hint">Your manager will add your checklist.</p>') +
+      '</div>' +
+      (p.invoices.length ? '<div class="card" style="padding:18px"><h3 style="margin:0 0 10px;font-family:\'Fraunces\',serif">Payments</h3>' + p.invoices.map(function(i){
+        var pay = i.status==="pending" && i.pay ? [i.pay.click?'<a class="btn btn-primary btn-sm" href="'+esc(i.pay.click)+'">Pay with Click</a>':'', i.pay.payme?'<a class="btn btn-primary btn-sm" href="'+esc(i.pay.payme)+'">Pay with Payme</a>':''].join(" ") : "";
+        return '<div class="check-row" style="flex-wrap:wrap"><div style="flex:1"><b>'+esc(i.description)+'</b><div class="hint">'+Number(i.amount_uzs).toLocaleString("en-US")+' so\'m · '+esc(i.status)+'</div></div>'+pay+'</div>';
+      }).join("") + '</div>' : '') +
+    '</div></section>';
+}
+
+function renderHelp(){
+  return '<section class="section" style="padding-top:28px">' +
+    '<div class="eyebrow">UniSprint agency</div><h2 style="margin:4px 0 6px;font-size:26px">Get help applying to Korea</h2>' +
+    '<p class="hint" style="max-width:60ch">Leave your number and a UniSprint manager will call you about universities, documents, the visa and arrival. Parents are welcome to fill this in.</p>' +
+    '<div class="grid-cards" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:16px">' +
+      '<form class="card auth-card" id="leadForm" style="max-width:none">' +
+        '<div class="field"><label for="ldName">Student name</label><input id="ldName" type="text" required></div>' +
+        '<div class="field"><label for="ldPhone">Phone or Telegram number</label><input id="ldPhone" type="tel" required placeholder="+998"></div>' +
+        '<div class="field"><label for="ldCity">City</label><input id="ldCity" type="text"></div>' +
+        '<div class="field"><label for="ldType">I want</label><select id="ldType"><option value="degree">A degree (bachelor or master)</option><option value="language">A Korean language program first</option></select></div>' +
+        '<div class="field"><label for="ldMsg">Anything else?</label><textarea id="ldMsg" placeholder="Which intake, which universities, questions…"></textarea></div>' +
+        '<input type="text" id="ldWebsite" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true">' +
+        '<div class="form-err" id="ldErr"></div><button class="btn btn-primary"'+(server.online?'':' disabled')+'>Send</button>' +
+        (server.online?'':'<p class="hint" style="margin:0">The form works on the UniSprint website.</p>') +
+      '</form>' +
+      '<div class="card auth-card" style="max-width:none"><h3 style="margin:0;font-family:\'Fraunces\',serif">Is this university safe for a visa?</h3>' +
+        '<p class="hint" style="margin:0">In September 2026 Korea restricted student visas at 20 universities for a year. Check any school before you apply or pay.</p>' +
+        '<div class="field"><label for="chkName">University name</label><input id="chkName" type="text" placeholder="e.g. Sangji"></div>' +
+        '<button class="btn btn-ghost" id="chkBtn"'+(server.online?'':' disabled')+'>Check</button><div class="check-result" id="chkOut"></div>' +
+        '<p class="hint" style="margin:0">Always confirm on the official Study in Korea site.</p></div>' +
+    '</div></section>';
+}
+
+function bindAccountViews(route){
+  var si = document.getElementById("signinForm");
+  if(si) si.addEventListener("submit", function(e){
+    e.preventDefault();
+    api("POST","/api/auth/login",{email:document.getElementById("siEmail").value, password:document.getElementById("siPass").value})
+      .then(function(r){ if(r.user.role!=="student"){ location.href="/agency"; return; } location.hash="#dashboard"; location.reload(); })
+      .catch(function(err){ document.getElementById("siErr").textContent = err.message; });
+  });
+  var rg = document.getElementById("registerForm");
+  if(rg) rg.addEventListener("submit", function(e){
+    e.preventDefault();
+    api("POST","/api/auth/register",{invite_code:document.getElementById("rgCode").value, email:document.getElementById("rgEmail").value, password:document.getElementById("rgPass").value})
+      .then(function(){ location.hash="#profile"; location.reload(); })
+      .catch(function(err){ document.getElementById("rgErr").textContent = err.message; });
+  });
+  var tg = document.getElementById("tgLinkBtn");
+  if(tg) tg.addEventListener("click", function(){
+    api("POST","/api/auth/telegram-link",{}).then(function(r){
+      if(r.link){ window.open(r.link, "_blank"); toast("Press Start in Telegram"); } else toast("Telegram reminders are not set up yet");
+    }).catch(function(err){ toast(err.message); });
+  });
+  var lf = document.getElementById("leadForm");
+  if(lf) lf.addEventListener("submit", function(e){
+    e.preventDefault();
+    api("POST","/api/leads",{name:document.getElementById("ldName").value, phone:document.getElementById("ldPhone").value, city:document.getElementById("ldCity").value,
+      program_type:document.getElementById("ldType").value, message:document.getElementById("ldMsg").value, website:document.getElementById("ldWebsite").value})
+      .then(function(){ lf.innerHTML = '<h3 style="margin:0;font-family:\'Fraunces\',serif">Thank you!</h3><p class="hint" style="margin:0">A UniSprint manager will contact you soon.</p>'; })
+      .catch(function(err){ document.getElementById("ldErr").textContent = err.message; });
+  });
+  var cb = document.getElementById("chkBtn");
+  if(cb) cb.addEventListener("click", function(){
+    var out = document.getElementById("chkOut");
+    api("GET","/api/universities/check?name="+encodeURIComponent(document.getElementById("chkName").value)).then(function(r){
+      if(!r.matches.length){ out.innerHTML = '<p class="hint" style="margin:0">Not on the restricted list we track. Confirm on Study in Korea.</p>'; return; }
+      out.innerHTML = r.matches.map(function(u){
+        var bad = u.restricted_degree || u.restricted_language;
+        var txt = bad ? "⚠ Visa restricted for " + (u.restricted_degree && u.restricted_language ? "all programs" : (u.restricted_degree ? "degree programs (D-2)" : "language programs (D-4)")) + (u.restricted_until ? " until " + u.restricted_until : "")
+          : ({excellent:"✓ IEQAS excellent", certified:"✓ IEQAS certified", not_certified:"Not IEQAS certified"}[u.ieqas_status] || "Not restricted on the list we track");
+        return '<div class="check-row"><div style="flex:1"><b>'+esc(u.name)+'</b><div class="hint" style="color:'+(bad?"var(--bad)":"var(--muted)")+'">'+esc(txt)+'</div></div></div>';
+      }).join("");
+    }).catch(function(err){ out.innerHTML = '<p class="form-err">'+esc(err.message)+'</p>'; });
+  });
 }
 
 /* ===================== RENDER: DASHBOARD ===================== */
@@ -1379,6 +1570,9 @@ function render(){
   else if(route.view==="applications") html = renderApplications();
   else if(route.view==="apply") html = renderApply(route.id);
   else if(route.view==="resources") html = renderResources();
+  else if(route.view==="signin") html = renderSignin();
+  else if(route.view==="progress") html = renderProgress();
+  else if(route.view==="help") html = renderHelp();
   else html = renderHome();
 
   app.innerHTML = html;
@@ -1398,6 +1592,7 @@ function render(){
   document.getElementById("appsCount").textContent = state.apps.length;
 
   bindViewEvents(route);
+  bindAccountViews(route);
 }
 
 /* ===================== EVENT BINDING ===================== */
@@ -1422,9 +1617,6 @@ function bindViewEvents(route){
       } else { done(); }
     });
   });
-
-  var bookBtn = document.getElementById("bookCallBtn");
-  if(bookBtn) bookBtn.addEventListener("click", function(){ toast("Not wired up yet — connect this to your real booking link"); });
 
   if(route.view==="explore"){
     var fq = document.getElementById("fq");
@@ -1613,5 +1805,6 @@ function bindViewEvents(route){
 }
 
 render();
+startAccount();
 })();
 </script>

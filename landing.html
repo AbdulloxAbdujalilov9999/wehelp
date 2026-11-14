@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UniSprint · Koreyada o'qish</title>
+<meta name="description" content="Koreya universitetlariga hujjat topshirish: universitet tanlashdan vizagacha. Ota-onalar jarayonni onlayn kuzatadi.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F6F9; --surface:#FFFFFF; --surface-2:#EBEEF4;
+  --ink:#121B30; --muted:#5B657C; --faint:#8A93A8;
+  --line:#D7DCE6; --accent:#C8791F; --accent-ink:#5C3410; --accent-soft:#F6E4C9;
+  --good:#1F7A4D; --good-soft:#DCF0E3; --bad:#9C3B3B; --bad-soft:#F6DEDE; --warn:#B4600F; --warn-soft:#FBE7CE;
+  --shadow:0 1px 2px rgba(18,27,48,.06), 0 8px 24px -12px rgba(18,27,48,.16);
+  --radius:14px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1220; --surface:#161C2E; --surface-2:#1E2538; --ink:#EDEFF5; --muted:#A9AFC2; --faint:#767E93;
+    --line:#2B3349; --accent:#E3A33E; --accent-ink:#2B1A08; --accent-soft:#3A2A13;
+    --good:#4EBE84; --good-soft:#163428; --bad:#E08080; --bad-soft:#3A1F1F; --warn:#E3A33E; --warn-soft:#3A2A13;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1220; --surface:#161C2E; --surface-2:#1E2538; --ink:#EDEFF5; --muted:#A9AFC2; --faint:#767E93;
+  --line:#2B3349; --accent:#E3A33E; --accent-ink:#2B1A08; --accent-soft:#3A2A13;
+  --good:#4EBE84; --good-soft:#163428; --bad:#E08080; --bad-soft:#3A1F1F; --warn:#E3A33E; --warn-soft:#3A2A13;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Public Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:"Fraunces",Georgia,serif;line-height:1.15;margin:0}
+a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+header.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;text-decoration:none}
+.mark{width:30px;height:30px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-weight:700}
+.langs{display:flex;gap:4px}
+.langs button{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:5px 10px;font:600 12px "Public Sans",sans-serif;cursor:pointer}
+.langs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;padding:12px 18px;font:600 15px "Public Sans",sans-serif;border:1px solid transparent;cursor:pointer;text-decoration:none}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{filter:brightness(1.05)}
+.btn-ghost{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.btn:disabled{opacity:.6;cursor:default}
+.deadline{background:var(--warn-soft);color:var(--warn);border-bottom:1px solid var(--line);font-size:14px}
+.deadline .wrap{padding-top:9px;padding-bottom:9px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.deadline b{font-family:"IBM Plex Mono",monospace}
+.hero{padding:56px 0 40px}
+.hero h1{font-size:clamp(32px,6vw,52px);max-width:16ch}
+.hero p.lede{font-size:18px;color:var(--muted);max-width:56ch;margin:18px 0 26px}
+.hero .ctas{display:flex;gap:10px;flex-wrap:wrap}
+.trust{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:36px}
+@media (max-width:760px){.trust{grid-template-columns:1fr}}
+.trust div{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;font-size:14px;color:var(--muted)}
+.trust b{display:block;color:var(--ink);font-size:15px;margin-bottom:2px}
+section{padding:44px 0}
+.eyebrow{font:600 12px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+section h2{font-size:clamp(24px,4vw,34px);margin:6px 0 10px}
+.sub{color:var(--muted);max-width:60ch;margin:0 0 24px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:860px){.steps{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.steps{grid-template-columns:1fr}}
+.step{padding:18px}
+.step .k{font:500 13px "IBM Plex Mono",monospace;color:var(--accent)}
+.step h3{font-size:18px;margin:6px 0}
+.step p{margin:0;color:var(--muted);font-size:14px}
+.pkgs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:stretch}
+@media (max-width:900px){.pkgs{grid-template-columns:1fr}}
+.pkg{padding:22px;display:flex;flex-direction:column;gap:12px;position:relative}
+.pkg.featured{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--shadow)}
+.ribbon{position:absolute;top:-11px;right:18px;background:var(--accent);color:var(--accent-ink);font:700 11px "Public Sans",sans-serif;padding:3px 10px;border-radius:999px}
+.pkg h3{font-size:20px}
+.pkg .price{font:600 26px "IBM Plex Mono",monospace}
+.pkg .price small{font:500 13px "Public Sans",sans-serif;color:var(--muted)}
+.pkg ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;flex:1}
+.pkg li{display:flex;gap:8px;font-size:14px;color:var(--muted)}
+.pkg li::before{content:"✓";color:var(--good);font-weight:700}
+.pkg .dep{font-size:13px;color:var(--faint)}
+.checker{padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:760px){.checker{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label{font-size:13px;font-weight:600;color:var(--muted)}
+input,select,textarea{font:15px "Public Sans",sans-serif;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);width:100%}
+textarea{min-height:84px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.row2{grid-template-columns:1fr}}
+.result{padding:12px 14px;border-radius:10px;font-size:14px;margin-top:10px}
+.result.ok{background:var(--good-soft);color:var(--good)}
+.result.bad{background:var(--bad-soft);color:var(--bad)}
+.result.unk{background:var(--surface-2);color:var(--muted)}
+.lead{display:grid;grid-template-columns:1fr 1.2fr;gap:24px;align-items:start}
+@media (max-width:860px){.lead{grid-template-columns:1fr}}
+.lead form{padding:22px}
+.contact-list{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.contact-list a{display:flex;gap:10px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);text-decoration:none;font-weight:600}
+.faq details{border-bottom:1px solid var(--line);padding:14px 0}
+.faq summary{cursor:pointer;font-weight:600}
+.faq p{color:var(--muted);margin:8px 0 0}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.done{padding:22px;text-align:center}
+.done h3{font-size:22px;margin-bottom:8px}
+footer{padding:30px 0 40px;color:var(--faint);font-size:13px;border-top:1px solid var(--line)}
+footer .wrap{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between}
+footer nav{display:flex;gap:14px;flex-wrap:wrap}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="deadline hide" id="deadlineBar"><div class="wrap" id="deadlineText"></div></div>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><span class="mark">U</span>UniSprint</a>
+    <div class="langs" role="group" aria-label="Language">
+      <button data-lang="uz">O'z</button><button data-lang="ru">Ру</button><button data-lang="en">En</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div class="eyebrow" data-t="eyebrow"></div>
+    <h1 data-t="h1"></h1>
+    <p class="lede" data-t="lede"></p>
+    <div class="ctas">
+      <a class="btn btn-primary" href="#ariza" data-t="cta"></a>
+      <a class="btn btn-ghost" href="#tekshir" data-t="cta2"></a>
+    </div>
+    <div class="trust">
+      <div><b data-t="tr1h"></b><span data-t="tr1"></span></div>
+      <div><b data-t="tr2h"></b><span data-t="tr2"></span></div>
+      <div><b data-t="tr3h"></b><span data-t="tr3"></span></div>
+    </div>
+  </div>
+
+  <section id="qanday">
+    <div class="wrap">
+      <div class="eyebrow" data-t="howE"></div>
+      <h2 data-t="howH"></h2>
+      <div class="steps">
+        <div class="card step"><div class="k">01</div><h3 data-t="s1h"></h3><p data-t="s1"></p></div>
+        <div class="card step"><div class="k">02</div><h3 data-t="s2h"></h3><p data-t="s2"></p></div>
+        <div class="card step"><div class="k">03</div><h3 data-t="s3h"></h3><p data-t="s3"></p></div>
+        <div class="card step"><div class="k">04</div><h3 data-t="s4h"></h3><p data-t="s4"></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="narxlar">
+    <div class="wrap">
+      <div class="eyebrow" data-t="pkgE"></div>
+      <h2 data-t="pkgH"></h2>
+      <p class="sub" data-t="pkgSub"></p>
+      <div class="pkgs" id="pkgs"></div>
+    </div>
+  </section>
+
+  <section id="tekshir">
+    <div class="wrap">
+      <div class="card checker">
+        <div>
+          <div class="eyebrow" data-t="chkE"></div>
+          <h2 data-t="chkH"></h2>
+          <p class="sub" style="margin:0" data-t="chkSub"></p>
+        </div>
+        <form id="chkForm">
+          <div class="field"><label for="chkName" data-t="chkLabel"></label><input id="chkName" required minlength="3" placeholder="Sangji, Hanyang…"></div>
+          <button class="btn btn-ghost" type="submit" data-t="chkBtn"></button>
+          <div id="chkOut"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="ariza">
+    <div class="wrap lead">
+      <div>
+        <div class="eyebrow" data-t="leadE"></div>
+        <h2 data-t="leadH"></h2>
+        <p class="sub" data-t="leadSub"></p>
+        <div class="contact-list" id="contacts"></div>
+      </div>
+      <div class="card" id="leadCard">
+        <form id="leadForm" novalidate>
+          <div class="row2">
+            <div class="field"><label for="fName" data-t="fName"></label><input id="fName" name="name" required autocomplete="name"></div>
+            <div class="field"><label for="fPhone" data-t="fPhone"></label><input id="fPhone" name="phone" type="tel" required placeholder="+998" autocomplete="tel"></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label for="fParent" data-t="fParent"></label><input id="fParent" name="parent_phone" type="tel" placeholder="+998"></div>
+            <div class="field"><label for="fCity" data-t="fCity"></label><input id="fCity" name="city" autocomplete="address-level2"></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label for="fPkg" data-t="fPkg"></label><select id="fPkg" name="package"></select></div>
+            <div class="field"><label for="fIntake" data-t="fIntake"></label>
+              <select id="fIntake" name="target_intake">
+                <option value="March 2027">2027 · mart / март / March</option>
+                <option value="June 2027">2027 · iyun / июнь / June</option>
+                <option value="September 2027">2027 · sentyabr / сентябрь / September</option>
+                <option value="Later" data-t="later"></option>
+              </select>
+            </div>
+          </div>
+          <div class="field"><label for="fMsg" data-t="fMsg"></label><textarea id="fMsg" name="message"></textarea></div>
+          <div class="hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+          <button class="btn btn-primary" type="submit" style="width:100%" data-t="send"></button>
+          <p id="formErr" class="result bad hide"></p>
+          <p style="font-size:12px;color:var(--faint);margin:12px 0 0" data-t="privacy"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="savollar">
+    <div class="wrap faq">
+      <div class="eyebrow" data-t="faqE"></div>
+      <h2 data-t="faqH"></h2>
+      <div id="faq"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© UniSprint</span>
+    <nav><a href="/app" data-t="toolsLink"></a><a href="/agency" data-t="staffLink"></a></nav>
+  </div>
+</footer>
+
+<script>
+var T = {
+  uz:{
+    eyebrow:"Koreyada o'qish · 2027 qabuli",
+    h1:"Koreyaga o'qishga hujjatlarni biz topshiramiz",
+    lede:"Universitet tanlashdan vizagacha hammasini qilamiz. Siz va ota-onangiz har bir qadamni shaxsiy sahifada va Telegramda kuzatib borasiz.",
+    cta:"Bepul maslahat olish", cta2:"Universitetni tekshirish",
+    tr1h:"Faqat viza bera oladigan universitetlar", tr1:"2026-yil sentyabrdan Koreya 20 ta universitetga viza berishni to'xtatdi. Biz har birini tekshiramiz.",
+    tr2h:"Yozma shartnoma", tr2:"Narx, muddatlar va pulni qaytarish tartibi to'lovdan oldin shartnomada yoziladi.",
+    tr3h:"Ota-onalar uchun sahifa", tr3:"Hujjatlar, arizalar, to'lovlar va yangiliklar o'zbek, rus yoki ingliz tilida.",
+    howE:"Qanday ishlaydi", howH:"To'rt qadam",
+    s1h:"Bepul maslahat", s1:"Maqsad, til darajasi va byudjetni gaplashamiz. Mos universitetlarni taklif qilamiz.",
+    s2h:"Shartnoma va oldindan to'lov", s2:"Paketni tanlaysiz, shartnoma imzolaymiz. Click, Payme, naqd yoki bank orqali to'lash mumkin.",
+    s3h:"Hujjatlar va ariza", s3:"Ro'yxat beramiz, tarjima va apostilni tekshiramiz, arizani o'zimiz topshiramiz.",
+    s4h:"Viza va jo'nash", s4:"Taklifnoma, viza hujjatlari, elchixona va yotoqxona. Jarayon tugaguncha yoningizdamiz.",
+    pkgE:"Narxlar", pkgH:"Xizmat paketlari", pkgSub:"Narx so'mda. Universitet kontrakti, tarjima, apostil va viza yig'imi alohida to'lanadi.",
+    from:"so'm", deposit:"Oldindan to'lov: {d} so'm, qolgani qabul xatidan keyin", pick:"Shu paketni tanlash", popular:"Ko'p tanlanadi",
+    noPkgs:"Narxlar uchun quyidagi forma orqali bog'laning.",
+    chkE:"Pul to'lashdan oldin", chkH:"Universitet viza bera oladimi?", chkSub:"Universitet nomini yozing. Koreya 2026-yil sentyabrda e'lon qilgan cheklovlar ro'yxati bo'yicha tekshiramiz.",
+    chkLabel:"Universitet nomi", chkBtn:"Tekshirish",
+    chkBad:"{n}: viza cheklovi bor ({p}). Bu universitetga hozir hujjat topshirmang.", chkOk:"{n}: cheklovlar ro'yxatida yo'q.",
+    chkNone:"Bu nom bizning ro'yxatda topilmadi. Bizga yozing, tekshirib beramiz.", chkNote:"Yakuniy tekshiruvni rasmiy Study in Korea ro'yxati bo'yicha menejer qiladi.",
+    degree:"bakalavr/magistr, D-2", language:"til kursi, D-4", all:"barcha dasturlar",
+    leadE:"Ariza", leadH:"Bepul maslahatga yoziling", leadSub:"Raqamingizni qoldiring, menejerimiz bir ish kuni ichida qo'ng'iroq qiladi yoki Telegramda yozadi. Formani ota-onalar ham to'ldirishi mumkin.",
+    fName:"Talabaning ismi", fPhone:"Telefon yoki Telegram raqami", fParent:"Ota-onaning raqami (ixtiyoriy)", fCity:"Shahar",
+    fPkg:"Paket", fIntake:"Qachon boshlamoqchisiz?", fMsg:"Savollaringiz (ixtiyoriy)", later:"Keyinroq",
+    pkgUnsure:"Hali bilmayman", send:"Yuborish", sending:"Yuborilmoqda…",
+    privacy:"Raqamingiz faqat siz bilan bog'lanish uchun ishlatiladi. Pasport va boshqa hujjatlarni bu yerga yuklamang.",
+    errReq:"Ism va telefon raqamini yozing.", errNet:"Yuborib bo'lmadi. Internetni tekshirib qayta urinib ko'ring yoki Telegramda yozing.",
+    doneH:"Rahmat! Arizangiz qabul qilindi.", doneP:"Menejerimiz tez orada bog'lanadi. Shoshilinch bo'lsa, Telegramda yozing.",
+    tg:"Telegramda yozish", call:"Qo'ng'iroq qilish", ig:"Instagram",
+    dl:"{name}: arizalar {date} kuni yopiladi. <b>{days}</b> kun qoldi.", dlToday:"{name}: arizalar bugun yopiladi.",
+    faqE:"Savollar", faqH:"Ko'p so'raladigan savollar",
+    faq:[
+      ["Viza berilmasa nima bo'ladi?","2026-yil oktyabrdan Koreya universitetlari viza rad etilsa kontrakt pulini qaytarishi shart. Bizning xizmat haqimizni qaytarish tartibi shartnomada yoziladi."],
+      ["Bank hisobida qancha pul bo'lishi kerak?","Universitet va dasturga bog'liq. Masalan, Yonsei til kursi uchun 8 million vondan ortiq qoldiq so'raladi. Maslahatda aniq summani aytamiz."],
+      ["Koreys tilini bilmasam bo'ladimi?","Ha. Til kursiga (D-4) til bilmasdan borish mumkin. Bakalavr uchun odatda TOPIK yoki IELTS kerak."],
+      ["To'lovni qanday qilaman?","Click, Payme, naqd yoki bank o'tkazmasi. Har bir to'lov uchun ota-onalar sahifasida hisob-faktura chiqadi."],
+      ["Mart qabuliga ulguramanmi?","Ko'p til institutlari mart uchun arizani dekabr o'rtasida yopadi. Hujjatlar taxminan 5-dekabrgacha tayyor bo'lishi kerak. Ulgurmasangiz, iyun qabuli uchun arizalar yanvar oxiridan ochiladi."]
+    ],
+    toolsLink:"Talabalar uchun vosita", staffLink:"Xodimlar uchun"
+  },
+  ru:{
+    eyebrow:"Учёба в Корее · набор 2027",
+    h1:"Подадим документы в корейский университет за вас",
+    lede:"От выбора университета до визы делаем всё сами. Вы и родители следите за каждым шагом на личной странице и в Telegram.",
+    cta:"Бесплатная консультация", cta2:"Проверить университет",
+    tr1h:"Только университеты, которые дают визу", tr1:"С сентября 2026 года Корея запретила визы для 20 университетов. Мы проверяем каждый.",
+    tr2h:"Письменный договор", tr2:"Цена, сроки и порядок возврата прописаны в договоре до оплаты.",
+    tr3h:"Страница для родителей", tr3:"Документы, заявки, оплаты и новости на узбекском, русском или английском.",
+    howE:"Как это работает", howH:"Четыре шага",
+    s1h:"Бесплатная консультация", s1:"Обсуждаем цель, уровень языка и бюджет. Предлагаем подходящие университеты.",
+    s2h:"Договор и предоплата", s2:"Вы выбираете пакет, мы подписываем договор. Оплата через Click, Payme, наличными или банком.",
+    s3h:"Документы и заявка", s3:"Даём список, проверяем перевод и апостиль, подаём заявку сами.",
+    s4h:"Виза и отъезд", s4:"Приглашение, документы на визу, посольство и общежитие. Мы рядом до конца.",
+    pkgE:"Цены", pkgH:"Пакеты услуг", pkgSub:"Цены в сумах. Обучение в университете, перевод, апостиль и визовый сбор оплачиваются отдельно.",
+    from:"сум", deposit:"Предоплата: {d} сум, остальное после письма о зачислении", pick:"Выбрать этот пакет", popular:"Выбирают чаще",
+    noPkgs:"Чтобы узнать цены, оставьте заявку ниже.",
+    chkE:"Перед оплатой", chkH:"Может ли университет дать визу?", chkSub:"Напишите название. Проверим по списку ограничений, объявленному Кореей в сентябре 2026 года.",
+    chkLabel:"Название университета", chkBtn:"Проверить",
+    chkBad:"{n}: есть визовое ограничение ({p}). Сейчас не подавайте сюда документы.", chkOk:"{n}: нет в списке ограничений.",
+    chkNone:"Не нашли такое название в нашем списке. Напишите нам, проверим.", chkNote:"Окончательную проверку по официальному списку Study in Korea делает менеджер.",
+    degree:"бакалавриат/магистратура, D-2", language:"языковые курсы, D-4", all:"все программы",
+    leadE:"Заявка", leadH:"Запишитесь на бесплатную консультацию", leadSub:"Оставьте номер, менеджер позвонит или напишет в Telegram в течение рабочего дня. Форму могут заполнить и родители.",
+    fName:"Имя студента", fPhone:"Телефон или номер Telegram", fParent:"Номер родителя (необязательно)", fCity:"Город",
+    fPkg:"Пакет", fIntake:"Когда хотите начать?", fMsg:"Ваши вопросы (необязательно)", later:"Позже",
+    pkgUnsure:"Пока не знаю", send:"Отправить", sending:"Отправляем…",
+    privacy:"Номер используется только для связи с вами. Не загружайте сюда паспорт и другие документы.",
+    errReq:"Укажите имя и номер телефона.", errNet:"Не удалось отправить. Проверьте интернет и попробуйте снова или напишите в Telegram.",
+    doneH:"Спасибо! Заявка принята.", doneP:"Менеджер скоро свяжется с вами. Если срочно, напишите в Telegram.",
+    tg:"Написать в Telegram", call:"Позвонить", ig:"Instagram",
+    dl:"{name}: приём заявок закрывается {date}. Осталось дней: <b>{days}</b>.", dlToday:"{name}: приём заявок закрывается сегодня.",
+    faqE:"Вопросы", faqH:"Частые вопросы",
+    faq:[
+      ["Что если визу не дадут?","С октября 2026 года корейские университеты обязаны вернуть оплату обучения при отказе в визе. Порядок возврата нашей оплаты прописан в договоре."],
+      ["Сколько денег нужно на банковском счёте?","Зависит от университета и программы. Например, для языковых курсов Yonsei нужен остаток более 8 млн вон. Точную сумму скажем на консультации."],
+      ["Можно без знания корейского?","Да. На языковые курсы (D-4) можно ехать без языка. Для бакалавриата обычно нужен TOPIK или IELTS."],
+      ["Как оплатить?","Click, Payme, наличными или банковским переводом. На каждую оплату на странице родителей появляется счёт."],
+      ["Успеем на мартовский набор?","Многие языковые институты закрывают приём на март в середине декабря. Документы нужны примерно до 5 декабря. Если не успеете, приём на июнь открывается в конце января."]
+    ],
+    toolsLink:"Инструменты для студентов", staffLink:"Для сотрудников"
+  },
+  en:{
+    eyebrow:"Study in Korea · 2027 intake",
+    h1:"We apply to Korean universities for you",
+    lede:"From choosing a university to the visa, we do the work. You and your parents follow every step on a private page and on Telegram.",
+    cta:"Get a free consultation", cta2:"Check a university",
+    tr1h:"Only universities that can sponsor a visa", tr1:"From September 2026 Korea stopped visas for 20 universities. We check every school.",
+    tr2h:"A written contract", tr2:"Price, timeline and refund terms are in the contract before you pay.",
+    tr3h:"A page for parents", tr3:"Documents, applications, payments and updates in Uzbek, Russian or English.",
+    howE:"How it works", howH:"Four steps",
+    s1h:"Free consultation", s1:"We talk about goals, language level and budget, and suggest universities that fit.",
+    s2h:"Contract and deposit", s2:"You choose a package and we sign a contract. Pay with Click, Payme, cash or bank transfer.",
+    s3h:"Documents and application", s3:"We give you the list, check translations and apostilles, and submit the application ourselves.",
+    s4h:"Visa and departure", s4:"Admission letter, visa documents, embassy and dormitory. We stay with you to the end.",
+    pkgE:"Prices", pkgH:"Service packages", pkgSub:"Prices in so'm. University tuition, translation, apostille and the visa fee are paid separately.",
+    from:"so'm", deposit:"Deposit: {d} so'm, the rest after the admission letter", pick:"Choose this package", popular:"Most chosen",
+    noPkgs:"Leave a request below to get prices.",
+    chkE:"Before you pay", chkH:"Can the university sponsor a visa?", chkSub:"Type the university's name. We check it against the restriction list Korea announced in September 2026.",
+    chkLabel:"University name", chkBtn:"Check",
+    chkBad:"{n}: visa restricted ({p}). Don't apply here now.", chkOk:"{n}: not on the restriction list.",
+    chkNone:"We couldn't find that name. Message us and we'll check.", chkNote:"Your manager makes the final check against the official Study in Korea list.",
+    degree:"degree, D-2", language:"language program, D-4", all:"all programs",
+    leadE:"Request", leadH:"Book a free consultation", leadSub:"Leave your number and a manager will call or message you on Telegram within one working day. Parents are welcome to fill this in.",
+    fName:"Student's name", fPhone:"Phone or Telegram number", fParent:"Parent's number (optional)", fCity:"City",
+    fPkg:"Package", fIntake:"When do you want to start?", fMsg:"Questions (optional)", later:"Later",
+    pkgUnsure:"Not sure yet", send:"Send", sending:"Sending…",
+    privacy:"We use your number only to contact you. Don't upload passports or other documents here.",
+    errReq:"Enter a name and phone number.", errNet:"Couldn't send. Check your connection and try again, or message us on Telegram.",
+    doneH:"Thank you! We got your request.", doneP:"A manager will contact you soon. If it's urgent, message us on Telegram.",
+    tg:"Message on Telegram", call:"Call", ig:"Instagram",
+    dl:"{name}: applications close on {date}. <b>{days}</b> days left.", dlToday:"{name}: applications close today.",
+    faqE:"Questions", faqH:"Frequently asked",
+    faq:[
+      ["What if the visa is refused?","Since October 2026, Korean universities must refund tuition when a visa is refused. The refund terms for our fee are in the contract."],
+      ["How much money must be in the bank account?","It depends on the university and program. For example, Yonsei's language program asks for a balance over 8 million won. We'll tell you the exact amount at the consultation."],
+      ["Can I go without Korean?","Yes. You can join a language program (D-4) with no Korean. Degree programs usually need TOPIK or IELTS."],
+      ["How do I pay?","Click, Payme, cash or bank transfer. Every payment gets an invoice on the parents' page."],
+      ["Can I still make the March intake?","Many language institutes close March applications in mid-December, so documents should be ready by about 5 December. If you miss it, June applications open in late January."]
+    ],
+    toolsLink:"Student tools", staffLink:"Staff"
+  }
+};
+
+var lang = "uz";
+try { lang = localStorage.getItem("unisprint_lang") || ""; } catch(e){}
+if(!T[lang]) lang = /^ru/i.test(navigator.language||"") ? "ru" : "uz";
+var cfg = null;
+var params = new URLSearchParams(location.search);
+var leadSource = (params.get("src") || params.get("utm_source") || "").replace(/[^\w-]/g,"").slice(0,40);
+
+function t(k){ return T[lang][k]; }
+function fmt(s, o){ return s.replace(/\{(\w+)\}/g, function(_,k){ return o[k]; }); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function som(n){ return Number(n).toLocaleString("ru-RU").replace(/ /g," "); }
+function $(id){ return document.getElementById(id); }
+
+function render(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach(function(el){ var v = t(el.getAttribute("data-t")); if(typeof v==="string") el.textContent = v; });
+  document.querySelectorAll(".langs button").forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-lang")===lang); });
+  renderPackages(); renderDeadline(); renderContacts(); renderFaq();
+}
+
+function renderPackages(){
+  var list = cfg && cfg.packages || [];
+  $("pkgs").innerHTML = list.length ? list.map(function(p){
+    return '<div class="card pkg'+(p.featured?' featured':'')+'">' + (p.featured?'<span class="ribbon">'+esc(t("popular"))+'</span>':'') +
+      '<h3>'+esc(p.name[lang])+'</h3><p style="margin:0;color:var(--muted);font-size:14px">'+esc(p.pitch[lang])+'</p>' +
+      '<div class="price">'+som(p.price_uzs)+' <small>'+esc(t("from"))+'</small></div>' +
+      (p.deposit_uzs && p.deposit_uzs < p.price_uzs ? '<div class="dep">'+esc(fmt(t("deposit"),{d:som(p.deposit_uzs)}))+'</div>' : '') +
+      '<ul>'+p.features[lang].map(function(f){ return '<li>'+esc(f)+'</li>'; }).join("")+'</ul>' +
+      '<a class="btn '+(p.featured?'btn-primary':'btn-ghost')+'" href="#ariza" data-pick="'+esc(p.id)+'">'+esc(t("pick"))+'</a></div>';
+  }).join("") : '<p class="sub">'+esc(t("noPkgs"))+'</p>';
+  var sel = $("fPkg"); if(!sel) return;
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">'+esc(t("pkgUnsure"))+'</option>' + list.map(function(p){ return '<option value="'+esc(p.id)+'">'+esc(p.name[lang])+'</option>'; }).join("");
+  sel.value = cur;
+}
+
+function renderDeadline(){
+  var d = cfg && cfg.deadlines && cfg.deadlines[0];
+  if(!d){ $("deadlineBar").classList.add("hide"); return; }
+  var close = new Date(d.closes+"T23:59:59+05:00");
+  var days = Math.ceil((close - Date.now()) / 86400000) - 1;
+  var day = Number(d.closes.slice(8,10)), mon = Number(d.closes.slice(5,7)) - 1;
+  var date = lang==="uz" ? day+"-"+["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentyabr","oktyabr","noyabr","dekabr"][mon]
+    : lang==="ru" ? day+" "+["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"][mon]
+    : day+" "+["January","February","March","April","May","June","July","August","September","October","November","December"][mon];
+  var tmpl = t("dl");
+  $("deadlineText").innerHTML = days <= 0 ? esc(fmt(t("dlToday"),{name:d.name[lang]})) : fmt(tmpl, {name:esc(d.name[lang]), date:esc(date), days:days});
+  $("deadlineBar").classList.remove("hide");
+}
+
+function renderContacts(){
+  var c = cfg && cfg.contact || {};
+  var h = "";
+  if(c.telegram) h += '<a href="https://t.me/'+encodeURIComponent(c.telegram)+'" target="_blank" rel="noopener">✈️ '+esc(t("tg"))+' · @'+esc(c.telegram)+'</a>';
+  if(c.phone) h += '<a href="tel:'+esc(c.phone.replace(/[^\d+]/g,""))+'">📞 '+esc(t("call"))+' · '+esc(c.phone)+'</a>';
+  if(c.instagram) h += '<a href="https://instagram.com/'+encodeURIComponent(c.instagram)+'" target="_blank" rel="noopener">📷 '+esc(t("ig"))+' · @'+esc(c.instagram)+'</a>';
+  $("contacts").innerHTML = h;
+}
+
+function renderFaq(){
+  $("faq").innerHTML = t("faq").map(function(q){ return '<details><summary>'+esc(q[0])+'</summary><p>'+esc(q[1])+'</p></details>'; }).join("");
+}
+
+document.querySelectorAll(".langs button").forEach(function(b){
+  b.addEventListener("click", function(){ lang = b.getAttribute("data-lang"); try{ localStorage.setItem("unisprint_lang", lang); }catch(e){} render(); });
+});
+
+document.addEventListener("click", function(e){
+  var a = e.target.closest("[data-pick]");
+  if(a){ $("fPkg").value = a.getAttribute("data-pick"); }
+});
+
+$("chkForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  var q = $("chkName").value.trim(), out = $("chkOut");
+  if(q.length < 3) return;
+  fetch("/api/universities/check?name="+encodeURIComponent(q)).then(function(r){ return r.json(); }).then(function(r){
+    var m = r.matches || [];
+    if(!m.length){ out.innerHTML = '<div class="result unk">'+esc(t("chkNone"))+'</div>'; return; }
+    out.innerHTML = m.slice(0,5).map(function(u){
+      var restricted = u.restricted_degree || u.restricted_language;
+      if(restricted){
+        var p = u.restricted_degree && u.restricted_language ? t("all") : u.restricted_degree ? t("degree") : t("language");
+        return '<div class="result bad">'+esc(fmt(t("chkBad"),{n:u.name, p:p}))+'</div>';
+      }
+      return '<div class="result ok">'+esc(fmt(t("chkOk"),{n:u.name}))+'</div>';
+    }).join("") + '<p style="font-size:12px;color:var(--faint);margin:8px 0 0">'+esc(t("chkNote"))+'</p>';
+  }).catch(function(){ out.innerHTML = '<div class="result unk">'+esc(t("chkNone"))+'</div>'; });
+});
+
+$("leadForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  var f = e.target, err = $("formErr"), btn = f.querySelector("button[type=submit]");
+  var body = {};
+  ["name","phone","parent_phone","city","package","target_intake","message","website"].forEach(function(k){ body[k] = (f.elements[k].value||"").trim(); });
+  if(leadSource) body.source = leadSource;
+  if(!body.name || body.phone.replace(/\D/g,"").length < 7){ err.textContent = t("errReq"); err.classList.remove("hide"); return; }
+  err.classList.add("hide"); btn.disabled = true; btn.textContent = t("sending");
+  fetch("/api/leads", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)})
+    .then(function(r){ if(!r.ok) throw new Error(r.status); })
+    .then(function(){
+      $("leadCard").innerHTML = '<div class="done"><h3>'+esc(t("doneH"))+'</h3><p style="color:var(--muted)">'+esc(t("doneP"))+'</p></div>';
+    })
+    .catch(function(){ err.textContent = t("errNet"); err.classList.remove("hide"); btn.disabled = false; btn.textContent = t("send"); });
+});
+
+render();
+fetch("/api/config").then(function(r){ return r.json(); }).then(function(c){ cfg = c; render(); }).catch(function(){ render(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "_note": "Default checklists applied to every new application. Override per university in the agency board (Universities tab). Confirm each list against the university's current admission guide.",
+  "degree": [
+    ["application_form", "University application form"],
+    ["passport", "Passport copy"],
+    ["photo", "Passport photo (3x4)"],
+    ["diploma", "High school diploma, apostilled + translated"],
+    ["transcript", "High school transcript, apostilled + translated"],
+    ["language_cert", "Language certificate (TOPIK or IELTS/TOEFL)"],
+    ["study_plan", "Personal statement and study plan"],
+    ["recommendation", "Recommendation letter"],
+    ["bank_statement", "Bank balance certificate (amount set by the university)"],
+    ["family_relation", "Family relation certificate, apostilled + translated"],
+    ["parents_ids", "Parents' passport or ID copies"]
+  ],
+  "language": [
+    ["application_form", "Language program application form"],
+    ["passport", "Passport copy"],
+    ["photo", "Passport photo (3x4)"],
+    ["diploma", "Highest diploma, apostilled + translated"],
+    ["transcript", "Transcript, apostilled + translated"],
+    ["study_plan", "Study plan"],
+    ["bank_statement", "Bank balance certificate (amount set by the university)"],
+    ["family_relation", "Family relation certificate (if a parent sponsors)"]
+  ],
+  "visa": [
+    ["admission_letter", "Certificate of admission (from the university)"],
+    ["business_reg", "University business registration copy"],
+    ["visa_form", "Visa application form"],
+    ["tb_test", "Tuberculosis test certificate"],
+    ["tuition_receipt", "Tuition payment receipt"]
+  ]
+}
