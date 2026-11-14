@@ -59,6 +59,7 @@ TEST_DATABASE_URL=postgres://postgres@localhost/unisprint_test npm test
 | Variable | Needed for |
 |---|---|
 | `DATABASE_URL` | Always |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME` | Creates the first admin on start when none exists (for hosts without a shell). Remove the password afterwards. |
 | `DB_SCHEMA` | Optional. Keeps the tables in their own schema in a shared database, e.g. `agency` in a Supabase project. Needs a session-mode connection (Supabase session pooler, port 5432). |
 | `CONTACT_TELEGRAM`, `CONTACT_PHONE`, `CONTACT_INSTAGRAM` | Contacts on the sales page |
 | `PUBLIC_URL` | Payment return links, e.g. `https://unisprint.uz` |
