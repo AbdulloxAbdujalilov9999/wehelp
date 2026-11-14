@@ -1,8 +1,13 @@
-# One-click deploy on Render: a Node web service plus a Postgres database.
+# Render blueprint: one Node web service. The database is not created here:
+# point DATABASE_URL at a durable Postgres (a paid Render database, or a new
+# database inside one you already pay for). Render's free Postgres is deleted
+# after 30 days, so it must not hold real students.
 services:
   - type: web
-    name: wehelp
+    name: unisprint-apply
     runtime: node
+    region: oregon
+    plan: free
     rootDir: server
     buildCommand: npm ci
     startCommand: npm start
@@ -11,10 +16,14 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        fromDatabase:
-          name: wehelp-db
-          property: connectionString
+        sync: false
       - key: PUBLIC_URL
+        sync: false
+      - key: CONTACT_TELEGRAM
+        sync: false
+      - key: CONTACT_PHONE
+        sync: false
+      - key: CONTACT_INSTAGRAM
         sync: false
       - key: TELEGRAM_BOT_TOKEN
         sync: false
@@ -32,6 +41,3 @@ services:
         sync: false
       - key: CLICK_SECRET_KEY
         sync: false
-databases:
-  - name: wehelp-db
-    plan: free

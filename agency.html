@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>WeHelp Agency</title>
+<title>UniSprint Agency</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -145,18 +145,18 @@ dialog form{display:flex;flex-direction:column;gap:10px}
 
 <div id="login" class="login hide">
   <form class="card" id="loginForm">
-    <div style="display:flex;align-items:center;gap:8px"><span class="mark">W</span><h1 style="font-size:22px">WeHelp Agency</h1></div>
+    <div style="display:flex;align-items:center;gap:8px"><span class="mark">U</span><h1 style="font-size:22px">UniSprint Agency</h1></div>
     <label class="f">Email<input type="email" name="email" required autocomplete="username"></label>
     <label class="f">Password<input type="password" name="password" required autocomplete="current-password"></label>
     <div class="err" id="loginErr"></div>
     <button class="btn btn-primary" type="submit">Sign in</button>
-    <a class="faint" href="/" style="font-size:12px">← Student site</a>
+    <a class="faint" href="/app" style="font-size:12px">← Student site</a>
   </form>
 </div>
 
 <div id="shell" class="hide">
   <header class="top">
-    <div class="brand"><span class="mark">W</span>WeHelp</div>
+    <div class="brand"><span class="mark">U</span>UniSprint</div>
     <nav class="tabs" id="tabs">
       <button data-tab="board" class="on">Board</button>
       <button data-tab="unis">Universities</button>
@@ -203,7 +203,7 @@ var APP_PILL = {draft:"p-muted",submitted:"p-info",review:"p-warn",admitted:"p-g
 var IEQAS = {excellent:"IEQAS excellent",certified:"IEQAS certified",unverified:"Not checked yet",not_certified:"Not certified",restricted:"Visa restricted"};
 var IEQAS_PILL = {excellent:"p-good",certified:"p-good",unverified:"p-muted",not_certified:"p-warn",restricted:"p-bad"};
 
-var me = null, students = [], universities = [], openId = null;
+var me = null, students = [], universities = [], packages = [], openId = null;
 
 /* ---------- helpers ---------- */
 function $(id){ return document.getElementById(id); }
@@ -254,13 +254,20 @@ function showShell(){
   $("who").textContent = me.name + " · " + me.role;
   $("tgBtn").textContent = me.telegram_linked ? "Telegram ✓" : "Connect Telegram";
   loadBoard(); loadUnis();
+  api("GET","/api/config").then(function(r){ packages = r.packages || []; }).catch(function(){});
 }
+document.addEventListener("change", function(e){
+  if(e.target.id !== "invPkg") return;
+  var o = e.target.selectedOptions[0];
+  if(!o || !o.dataset.a) return;
+  $("invDesc").value = o.dataset.d; $("invAmt").value = o.dataset.a;
+});
 $("loginForm").addEventListener("submit", function(e){
   e.preventDefault();
   var f = e.target;
   $("loginErr").textContent = "";
   api("POST","/api/auth/login",{email:f.email.value, password:f.password.value}).then(function(r){
-    if(r.user.role === "student"){ location.href = "/#dashboard"; return; }
+    if(r.user.role === "student"){ location.href = "/app#dashboard"; return; }
     me = r.user; showShell();
   }).catch(function(err){ $("loginErr").textContent = err.message; });
 });
@@ -366,7 +373,7 @@ $("newStudentBtn").addEventListener("click", function(){
     '<div class="grid2"><label class="f">Parent name<input type="text" name="parent_name"></label><label class="f">Parent phone<input type="tel" name="parent_phone"></label></div>' +
     '<div class="grid2"><label class="f">Program<select name="program_type"><option value="degree">Degree (D-2 visa)</option><option value="language">Language program (D-4)</option></select></label>' +
     '<label class="f">Target intake<input type="text" name="target_intake" placeholder="2027-03"></label></div>' +
-    '<label class="f">Package<input type="text" name="package" placeholder="Basic / Full with visa and housing"></label>' +
+    '<label class="f">Package<input type="text" name="package" list="pkgList" placeholder="Language program / Degree / Document check">'+'<datalist id="pkgList">'+packages.map(function(p){ return '<option value="'+esc(p.name.en)+'">'; }).join("")+'</datalist></label>' +
     '<div class="err" id="nsErr"></div>' +
     '<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-ghost" value="cancel" formnovalidate>Cancel</button><button class="btn btn-primary" value="ok">Add</button></div></form>';
   d.showModal();
@@ -469,6 +476,15 @@ function renderDrawer(){
       (i.status==="paid" ? '<button class="btn btn-ghost btn-sm" data-inv="'+i.id+'" data-to="refunded">Record refund</button>' : '') +
       '</div>';
   });
+  if(packages.length) h += '<div class="inline" style="margin-top:10px"><label class="f" style="flex:1">From a package<select id="invPkg"><option value="">Choose to fill in…</option>' +
+    packages.map(function(p){
+      var n = p.name.en, o = '';
+      if(p.deposit_uzs && p.deposit_uzs < p.price_uzs){
+        o += '<option data-d="'+esc(n+" · deposit")+'" data-a="'+p.deposit_uzs+'">'+esc(n)+' · deposit · '+som(p.deposit_uzs)+'</option>';
+        o += '<option data-d="'+esc(n+" · balance")+'" data-a="'+(p.price_uzs-p.deposit_uzs)+'">'+esc(n)+' · balance · '+som(p.price_uzs-p.deposit_uzs)+'</option>';
+      }
+      return o + '<option data-d="'+esc(n)+'" data-a="'+p.price_uzs+'">'+esc(n)+' · full · '+som(p.price_uzs)+'</option>';
+    }).join("") + '</select></label></div>';
   h += '<div class="inline" style="margin-top:10px"><label class="f">Description<input type="text" id="invDesc" placeholder="Application package"></label>' +
     '<label class="f">Amount (so\'m)<input type="number" id="invAmt" min="1000" step="1000"></label><button class="btn btn-primary btn-sm" data-act="add-inv">Create invoice</button></div></div>';
 

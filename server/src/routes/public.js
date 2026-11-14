@@ -6,6 +6,7 @@ const svc = require("../lib/students");
 const telegram = require("../lib/telegram");
 const rateLimit = require("../lib/rate-limit");
 const { payUrl, enabledProviders } = require("./payments");
+const catalog = require("../lib/catalog");
 
 const router = express.Router();
 
@@ -32,7 +33,7 @@ const parentLimit = rateLimit({ windowMs: 60 * 1000, max: 60 });
 router.get("/parent/:token", parentLimit, async (req, res) => {
   const token = String(req.params.token || "");
   const s = token.length >= 20 && (await db.one("SELECT id FROM students WHERE parent_token = $1", [token]));
-  if (!s) return res.status(404).json({ error: "This link is not valid. Ask WeHelp for a new one." });
+  if (!s) return res.status(404).json({ error: "This link is not valid. Ask UniSprint for a new one." });
   const view = await svc.progressView(s.id);
   view.telegram = telegram.deepLink(`p_${token}`);
   res.json(withPayLinks(view, `${baseUrl(req)}/parent.html#${token}`));
@@ -49,7 +50,7 @@ async function myStudent(req) {
 router.get("/me/progress", student, async (req, res) => {
   const s = await myStudent(req);
   if (!s) return res.status(404).json({ error: "No student card linked to this account" });
-  res.json(withPayLinks(await svc.progressView(s.id), `${baseUrl(req)}/#dashboard`));
+  res.json(withPayLinks(await svc.progressView(s.id), `${baseUrl(req)}/app#dashboard`));
 });
 
 // The student site keeps its profile, shortlist and app drafts as one JSON blob.
@@ -73,6 +74,18 @@ router.put("/me/state", student, express.json({ limit: "256kb" }), async (req, r
   res.json({ ok: true, saved_at: clean.saved_at });
 });
 
+/* ---------- Sales page config: packages, deadlines, contacts ---------- */
+
+router.get("/config", (_req, res) => {
+  const providers = enabledProviders();
+  res.json({
+    packages: catalog.packages(),
+    deadlines: catalog.deadlines(),
+    contact: catalog.contact(),
+    payments: { click: !!providers.click, payme: !!providers.payme },
+  });
+});
+
 /* ---------- Public lead form ("Get help applying") ---------- */
 
 const leadLimit = rateLimit({ windowMs: 60 * 60 * 1000, max: 5 });
@@ -83,16 +96,20 @@ router.post("/leads", leadLimit, async (req, res) => {
   const name = String(b.name || "").trim().slice(0, 120);
   const phone = String(b.phone || "").trim().slice(0, 40);
   if (!name || phone.replace(/\D/g, "").length < 7) return res.status(400).json({ error: "Name and phone number are required" });
-  const programType = b.program_type === "language" ? "language" : "degree";
+  const pkg = catalog.findPackage(b.package);
+  const programType = pkg ? pkg.program_type : b.program_type === "language" ? "language" : "degree";
+  const str = (v, n) => (v == null ? null : String(v).trim().slice(0, n) || null);
   const s = await db.one(
-    `INSERT INTO students (full_name, phone, email, city, parent_phone, program_type, target_intake, source, notes)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,'website',$8) RETURNING id`,
-    [name, phone, b.email || null, b.city || null, b.parent_phone || null, programType, b.target_intake || null, String(b.message || "").slice(0, 2000) || null]
+    `INSERT INTO students (full_name, phone, email, city, parent_name, parent_phone, program_type, target_intake, package, source, notes)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id`,
+    [name, phone, str(b.email, 200), str(b.city, 80), str(b.parent_name, 120), str(b.parent_phone, 40), programType,
+      str(b.target_intake, 40), pkg ? pkg.name.en : null, str(b.source, 40) || "website", str(b.message, 2000)]
   );
-  await svc.addEvent(s.id, null, "created", "Request from the website", false);
-  const admins = await db.many("SELECT telegram_chat_id FROM users WHERE role = 'admin' AND telegram_chat_id IS NOT NULL");
+  await svc.addEvent(s.id, null, "created", `Request from the website${pkg ? `: ${pkg.name.en}` : ""}`, false);
+  const admins = await db.many("SELECT telegram_chat_id FROM users WHERE role IN ('admin','agent') AND telegram_chat_id IS NOT NULL");
+  const line = [name, phone, pkg ? pkg.name.en : programType, b.target_intake].filter(Boolean).map((x) => telegram.escapeHtml(String(x))).join(" · ");
   for (const a of admins) {
-    await telegram.sendMessage(a.telegram_chat_id, `🆕 New lead: ${telegram.escapeHtml(name)}, ${telegram.escapeHtml(phone)} (${programType})`);
+    await telegram.sendMessage(a.telegram_chat_id, `🆕 New UniSprint lead: ${line}`);
   }
   res.status(201).json({ ok: true });
 });
@@ -115,20 +132,20 @@ router.post("/telegram/webhook/:secret", async (req, res) => {
       [chatId, payload.slice(2)]
     );
     await telegram.sendMessage(chatId, u
-      ? `✅ ${telegram.escapeHtml(u.name)}, WeHelp reminders are on. / Eslatmalar yoqildi. / Напоминания включены.`
-      : "This link has expired. Open WeHelp and press “Connect Telegram” again.");
+      ? `✅ ${telegram.escapeHtml(u.name)}, UniSprint reminders are on. / Eslatmalar yoqildi. / Напоминания включены.`
+      : "This link has expired. Open UniSprint and press “Connect Telegram” again.");
   } else if (payload.startsWith("p_")) {
     const s = await db.one("SELECT id, full_name FROM students WHERE parent_token = $1", [payload.slice(2)]);
     if (s) {
       await db.query("INSERT INTO parent_chats (student_id, chat_id) VALUES ($1,$2) ON CONFLICT DO NOTHING", [s.id, chatId]);
       const first = telegram.escapeHtml(s.full_name.split(" ")[0]);
       await telegram.sendMessage(chatId,
-        `✅ ${first}: WeHelp yangiliklari shu yerga keladi.\n✅ ${first}: новости WeHelp будут приходить сюда.\n✅ You'll get ${first}'s WeHelp updates here.`);
+        `✅ ${first}: UniSprint yangiliklari shu yerga keladi.\n✅ ${first}: новости UniSprint будут приходить сюда.\n✅ You'll get ${first}'s UniSprint updates here.`);
     } else {
-      await telegram.sendMessage(chatId, "This link is not valid. Ask WeHelp for a new one.");
+      await telegram.sendMessage(chatId, "This link is not valid. Ask UniSprint for a new one.");
     }
   } else {
-    await telegram.sendMessage(chatId, "WeHelp: open your WeHelp page and press “Connect Telegram” to get reminders here.");
+    await telegram.sendMessage(chatId, "UniSprint: open your UniSprint page and press “Connect Telegram” to get reminders here.");
   }
 });
 

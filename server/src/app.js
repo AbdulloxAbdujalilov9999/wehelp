@@ -3,7 +3,7 @@ const express = require("express");
 const auth = require("./lib/auth");
 
 const ROOT = path.join(__dirname, "..", "..");
-const PAGES = { "/": "index.html", "/index.html": "index.html", "/agency": "agency.html", "/agency.html": "agency.html", "/parent.html": "parent.html" };
+const PAGES = { "/": "landing.html", "/app": "index.html", "/index.html": "index.html", "/agency": "agency.html", "/agency.html": "agency.html", "/parent.html": "parent.html" };
 
 function createApp() {
   const app = express();

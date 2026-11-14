@@ -5,14 +5,14 @@ const assert = require("node:assert/strict");
 const crypto = require("crypto");
 
 process.env.NODE_ENV = "test";
-process.env.DATABASE_URL = process.env.TEST_DATABASE_URL || "postgres://postgres@localhost/wehelp_test";
+process.env.DATABASE_URL = process.env.TEST_DATABASE_URL || "postgres://postgres@localhost/unisprint_test";
 process.env.PAYME_KEY = "test-payme-key";
 process.env.PAYME_MERCHANT_ID = "merchant123";
 process.env.CLICK_SECRET_KEY = "click-secret";
 process.env.CLICK_SERVICE_ID = "777";
 process.env.CLICK_MERCHANT_ID = "888";
 process.env.TELEGRAM_WEBHOOK_SECRET = "hook";
-process.env.TELEGRAM_BOT_USERNAME = "wehelp_test_bot";
+process.env.TELEGRAM_BOT_USERNAME = "unisprint_test_bot";
 delete process.env.TELEGRAM_BOT_TOKEN;
 
 const db = require("../src/db");
@@ -165,7 +165,7 @@ let parentToken;
 test("parent link: progress view, Telegram linking, stage notifications", async () => {
   const link = await call("POST", `/api/board/students/${studentId}/parent-link`, { token: agentToken, body: {} });
   parentToken = link.body.token;
-  assert.match(link.body.telegram, /^https:\/\/t\.me\/wehelp_test_bot\?start=p_/);
+  assert.match(link.body.telegram, /^https:\/\/t\.me\/unisprint_test_bot\?start=p_/);
 
   const view = await call("GET", `/api/parent/${parentToken}`);
   assert.equal(view.status, 200);
@@ -370,8 +370,37 @@ test("public lead form creates a website lead", async () => {
   assert.equal((await call("POST", "/api/leads", { body: { name: "x", phone: "1" } })).status, 400);
 });
 
+test("sales page config lists packages, open deadlines and contacts", async () => {
+  process.env.CONTACT_TELEGRAM = "@unisprint_uz";
+  const r = await call("GET", "/api/config");
+  assert.equal(r.status, 200);
+  assert.ok(r.body.packages.length >= 2);
+  for (const p of r.body.packages) {
+    assert.ok(p.price_uzs > 0 && p.deposit_uzs > 0 && p.deposit_uzs <= p.price_uzs, p.id);
+    for (const l of ["uz", "ru", "en"]) assert.ok(p.name[l] && p.features[l].length, `${p.id} ${l}`);
+  }
+  assert.equal(r.body.contact.telegram, "unisprint_uz");
+  assert.deepEqual(r.body.payments, { click: true, payme: true });
+  const catalog = require("../src/lib/catalog");
+  assert.ok(catalog.deadlines(new Date("2027-12-01")).length === 0, "past deadlines are hidden");
+  delete process.env.CONTACT_TELEGRAM;
+});
+
+test("lead form records the chosen package and where the lead came from", async () => {
+  const r = await call("POST", "/api/leads", { body: { name: "Malika", phone: "+998 91 000 11 22", parent_phone: "+998 93 000 11 22",
+    package: "degree", target_intake: "March 2027", source: "telegram" } });
+  assert.equal(r.status, 201);
+  const row = await db.one("SELECT * FROM students WHERE full_name = 'Malika'");
+  assert.equal(row.program_type, "degree");
+  assert.match(row.package, /degree/i);
+  assert.equal(row.source, "telegram");
+  assert.equal(row.parent_phone, "+998 93 000 11 22");
+  await call("POST", "/api/leads", { body: { name: "Bekzod", phone: "+998 90 555 44 33", package: "nope" } });
+  assert.equal((await db.one("SELECT package FROM students WHERE full_name = 'Bekzod'")).package, null);
+});
+
 test("pages are served", async () => {
-  for (const p of ["/", "/agency", "/parent.html"]) {
+  for (const p of ["/", "/app", "/agency", "/parent.html"]) {
     const r = await fetch(base + p);
     assert.equal(r.status, 200, p);
   }

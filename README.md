@@ -1,14 +1,26 @@
-# WeHelp
+# UniSprint
 
-WeHelp is the working tool for a study-in-Korea agency. It has three parts:
+UniSprint (formerly WeHelp, and the same project as the `qabul-uz` repo) sells a
+done-for-you study-in-Korea application service to Uzbek families and runs the
+agency work behind it. It has four parts:
 
 | Page | Who uses it | What it does |
 |---|---|---|
-| `index.html` (`/`) | Students | Explore 20 Korean universities, compare them, build a profile, track colleges. Works offline from the file. When served by the WeHelp server, students can sign in and their data is saved to their account. Also has a lead form and a visa-restriction checker. |
+| `landing.html` (`/`) | Families | The sales page in Uzbek, Russian and English: the service, packages and prices in so'm, a countdown to the next intake deadline, a visa-restriction checker and the request form. Requests land on the agency board as leads. Add `?src=telegram` (or any word) to links you post, and the lead card shows where it came from. |
+| `index.html` (`/app`) | Students | Explore 20 Korean universities, compare them, build a profile, track colleges. Works offline from the file. When served by the UniSprint server, students can sign in and their data is saved to their account. Also has a lead form and a visa-restriction checker. |
 | `agency.html` (`/agency`) | The agency team | A board with every student as a card: lead → documents → applied → admitted → visa → arrived. Each card has applications, per-university document checklists, invoices, a family link and a timeline. |
 | `parent.html` (`/parent.html#<link>`) | Parents | A private progress page in Uzbek, Russian or English, with Click and Payme payment buttons and a Telegram link for updates. No account needed. |
 
 The backend is in [`server/`](server/): Node.js, Express and Postgres.
+
+## Packages, prices and contacts
+
+Packages, prices, deposits and the intake deadlines shown on the sales page live in
+[`server/data/packages.json`](server/data/packages.json). Edit that file and redeploy
+to change them. On the agency board, a student's Payments section can fill an invoice
+from a package (deposit, balance or full price). Contacts shown on the sales page come
+from `CONTACT_TELEGRAM`, `CONTACT_PHONE` and `CONTACT_INSTAGRAM`; when they are empty,
+the page shows only the form.
 
 ## What the backend does
 
@@ -26,7 +38,7 @@ You need Node 20+ and Postgres.
 ```bash
 cd server
 npm install
-export DATABASE_URL=postgres://postgres@localhost/wehelp
+export DATABASE_URL=postgres://postgres@localhost/unisprint
 npm run create-admin -- you@example.com 'a-strong-password' "Your Name"
 npm start            # http://localhost:3000, board at /agency
 ```
@@ -34,20 +46,21 @@ npm start            # http://localhost:3000, board at /agency
 The database tables and the university data are created on start. Tests use a separate database that they wipe:
 
 ```bash
-createdb wehelp_test
-TEST_DATABASE_URL=postgres://postgres@localhost/wehelp_test npm test
+createdb unisprint_test
+TEST_DATABASE_URL=postgres://postgres@localhost/unisprint_test npm test
 ```
 
 ## Deploy
 
-`render.yaml` sets up a web service and a Postgres database on Render. After the first deploy, open the service's Shell and run `npm run create-admin -- email password "Name"`. Note: Render's free Postgres is deleted after 30 days, so move to a paid database before real students are on it.
+`render.yaml` sets up the web service on Render. Set `DATABASE_URL` to a durable Postgres: Render's free Postgres is deleted after 30 days, so don't use it for real students. Add `?sslmode=require` to the URL when the database is outside Render's private network. The tables are created on start. Then create the first admin from the service's Shell (paid plans) or from your computer with the external database URL: `DATABASE_URL=... npm run create-admin -- email password "Name"`.
 
 ### Settings
 
 | Variable | Needed for |
 |---|---|
 | `DATABASE_URL` | Always |
-| `PUBLIC_URL` | Payment return links, e.g. `https://wehelp.uz` |
+| `CONTACT_TELEGRAM`, `CONTACT_PHONE`, `CONTACT_INSTAGRAM` | Contacts on the sales page |
+| `PUBLIC_URL` | Payment return links, e.g. `https://unisprint.uz` |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME` | Telegram. Create the bot with @BotFather. |
 | `TELEGRAM_WEBHOOK_SECRET` | Any random string. Then point the bot at the server once: `curl "https://api.telegram.org/bot$TOKEN/setWebhook?url=$PUBLIC_URL/api/telegram/webhook/$SECRET"` |
 | `PAYME_MERCHANT_ID`, `PAYME_KEY` | Payme. In the Payme merchant cabinet set the endpoint to `$PUBLIC_URL/api/payments/payme` and the account field to `invoice_id`. Use `PAYME_CHECKOUT_URL=https://checkout.test.paycom.uz` with the test key while testing. |

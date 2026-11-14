@@ -1,0 +1,92 @@
+{
+  "_note": "Done-for-you service packages shown on the sales page and used for invoices on the agency board. Prices are whole so'm. Agree them with your partner before launch; edit this file and redeploy to change them.",
+  "currency": "UZS",
+  "packages": [
+    {
+      "id": "language",
+      "program_type": "language",
+      "price_uzs": 6500000,
+      "deposit_uzs": 2000000,
+      "name": {
+        "uz": "Til kursi (D-4 viza)",
+        "ru": "Языковые курсы (виза D-4)",
+        "en": "Korean language program (D-4 visa)"
+      },
+      "pitch": {
+        "uz": "Koreya universitetining til institutiga, ariza topshirishdan vizagacha.",
+        "ru": "В языковой институт корейского университета, от заявки до визы.",
+        "en": "Into a Korean university's language institute, from application to visa."
+      },
+      "features": {
+        "uz": ["Viza bera oladigan (IEQAS) universitetni tanlash", "Hujjatlar ro'yxati, tarjima va apostilni nazorat qilish", "Ariza topshirish va kuzatish", "Kontrakt to'lovi va taklifnoma", "Viza hujjatlari va elchixonaga tayyorlash", "Yotoqxona va kutib olish bo'yicha maslahat"],
+        "ru": ["Выбор университета, который может дать визу (IEQAS)", "Список документов, контроль перевода и апостиля", "Подача и отслеживание заявки", "Оплата обучения и приглашение", "Документы на визу и подготовка к посольству", "Советы по общежитию и встрече"],
+        "en": ["Choose a university that can sponsor a visa (IEQAS)", "Document list, translation and apostille checks", "Submit and track the application", "Tuition payment and admission letter", "Visa documents and embassy preparation", "Advice on dormitory and arrival"]
+      }
+    },
+    {
+      "id": "degree",
+      "program_type": "degree",
+      "price_uzs": 12500000,
+      "deposit_uzs": 4000000,
+      "featured": true,
+      "name": {
+        "uz": "Bakalavr yoki magistratura (D-2 viza)",
+        "ru": "Бакалавриат или магистратура (виза D-2)",
+        "en": "Bachelor's or master's degree (D-2 visa)"
+      },
+      "pitch": {
+        "uz": "3 tagacha universitetga to'liq ariza, grant strategiyasi va viza bilan.",
+        "ru": "Полная подача в 3 университета, стратегия грантов и виза.",
+        "en": "Full applications to up to 3 universities, scholarship strategy and visa."
+      },
+      "features": {
+        "uz": ["Til kursidagi hamma narsa", "3 tagacha universitetga ariza", "Motivatsion xat va o'qish rejasini tahrirlash", "Tavsiyanomalar bo'yicha yo'riqnoma", "GKS va universitet grantlari strategiyasi", "Intervyuga tayyorlash"],
+        "ru": ["Всё из языкового пакета", "Заявки в 3 университета", "Редактура мотивационного письма и учебного плана", "Помощь с рекомендательными письмами", "Стратегия GKS и университетских грантов", "Подготовка к интервью"],
+        "en": ["Everything in the language package", "Applications to up to 3 universities", "Personal statement and study plan editing", "Guidance on recommendation letters", "GKS and university scholarship strategy", "Interview preparation"]
+      }
+    },
+    {
+      "id": "check",
+      "program_type": "language",
+      "price_uzs": 1500000,
+      "deposit_uzs": 1500000,
+      "name": {
+        "uz": "Hujjat va viza tekshiruvi",
+        "ru": "Проверка документов и визы",
+        "en": "Document and visa check"
+      },
+      "pitch": {
+        "uz": "O'zingiz topshirasizmi? Topshirishdan oldin hammasini tekshirib beramiz.",
+        "ru": "Подаёте сами? Проверим всё до подачи.",
+        "en": "Applying yourself? We check everything before you submit."
+      },
+      "features": {
+        "uz": ["Universitet viza bera olishini tekshirish", "Barcha hujjatlarni ko'rib chiqish", "Bank hisobi va viza talablari bo'yicha maslahat", "1 soatlik onlayn uchrashuv"],
+        "ru": ["Проверка, может ли университет дать визу", "Проверка всех документов", "Советы по банковскому счёту и требованиям визы", "1 час онлайн-встречи"],
+        "en": ["Check that the university can sponsor a visa", "Review every document", "Advice on the bank balance and visa requirements", "One-hour online meeting"]
+      }
+    }
+  ],
+  "deadlines": [
+    {
+      "closes": "2026-12-11",
+      "name": { "uz": "Seoultech til kursi, mart 2027", "ru": "Языковые курсы Seoultech, март 2027", "en": "Seoultech Korean program, March 2027" },
+      "source": "https://www.seoultech.ac.kr"
+    },
+    {
+      "closes": "2026-12-24",
+      "name": { "uz": "SNU til instituti, mart 2027", "ru": "Языковой институт SNU, март 2027", "en": "SNU Language Education Institute, March 2027" },
+      "source": "https://lei.snu.ac.kr"
+    },
+    {
+      "closes": "2027-03-12",
+      "name": { "uz": "Seoultech til kursi, iyun 2027", "ru": "Языковые курсы Seoultech, июнь 2027", "en": "Seoultech Korean program, June 2027" },
+      "source": "https://www.seoultech.ac.kr"
+    },
+    {
+      "closes": "2027-03-29",
+      "name": { "uz": "SNU til instituti, iyun 2027", "ru": "Языковой институт SNU, июнь 2027", "en": "SNU Language Education Institute, June 2027" },
+      "source": "https://lei.snu.ac.kr"
+    }
+  ]
+}
