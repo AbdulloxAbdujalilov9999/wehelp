@@ -1,8 +1,8 @@
 {
-  "name": "wehelp-server",
+  "name": "unisprint-server",
   "version": "0.1.0",
   "private": true,
-  "description": "WeHelp backend: accounts, agency board, parent view, Click/Payme payments, Telegram reminders",
+  "description": "UniSprint backend: accounts, agency board, parent view, Click/Payme payments, Telegram reminders",
   "type": "commonjs",
   "main": "src/index.js",
   "engines": { "node": ">=20" },

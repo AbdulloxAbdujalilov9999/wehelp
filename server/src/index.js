@@ -5,7 +5,7 @@ const { runReminders } = require("./lib/reminders");
 async function main() {
   await db.migrate();
   const port = Number(process.env.PORT) || 3000;
-  createApp().listen(port, () => console.log(`WeHelp server on :${port}`));
+  createApp().listen(port, () => console.log(`UniSprint server on :${port}`));
 
   // Hourly reminder pass, only between 09:00 and 21:00 Tashkent time (UTC+5).
   if (process.env.REMINDERS !== "off") {

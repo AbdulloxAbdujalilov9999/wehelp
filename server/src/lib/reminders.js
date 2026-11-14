@@ -73,7 +73,7 @@ async function runReminders(today = new Date()) {
       })
       .join("\n");
     const first = telegram.escapeHtml(info.name.split(" ")[0]);
-    const familyMsg = `⏰ <b>WeHelp</b> · ${first}\nHujjatlar muddati / Сроки документов:\n${body}`;
+    const familyMsg = `⏰ <b>UniSprint</b> · ${first}\nHujjatlar muddati / Сроки документов:\n${body}`;
     for (const chat of [to.student, ...to.parents]) {
       if (!chat) continue;
       await telegram.sendMessage(chat, familyMsg);

@@ -1,4 +1,4 @@
--- WeHelp core schema: accounts, universities, the agency pipeline, document
+-- UniSprint core schema: accounts, universities, the agency pipeline, document
 -- checklists, payments (Click + Payme) and Telegram reminders.
 
 CREATE TABLE users (

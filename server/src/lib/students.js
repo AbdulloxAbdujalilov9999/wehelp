@@ -39,7 +39,7 @@ async function setStage(student, stage, actorId) {
   const to = await recipients(student.id);
   const first = telegram.escapeHtml(student.full_name.split(" ")[0]);
   const msg =
-    `<b>WeHelp</b> · ${first}\n` +
+    `<b>UniSprint</b> · ${first}\n` +
     `🇺🇿 ${STAGE_LABELS.uz[stage]}\n🇷🇺 ${STAGE_LABELS.ru[stage]}\n🇬🇧 ${STAGE_LABELS.en[stage]}`;
   for (const chat of [to.student, ...to.parents]) await telegram.sendMessage(chat, msg);
   return updated;

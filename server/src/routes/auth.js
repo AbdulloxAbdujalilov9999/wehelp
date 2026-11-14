@@ -58,7 +58,7 @@ router.post("/register", loginLimit, async (req, res) => {
       [email, auth.hashPassword(password), name, student.phone]
     )).rows[0];
     await c.query("UPDATE students SET user_id = $1, invite_code = NULL, email = COALESCE(email, $2), updated_at = now() WHERE id = $3", [user.id, email, student.id]);
-    await c.query("INSERT INTO events (student_id, actor_id, kind, message, public) VALUES ($1,$2,'account','Student created their WeHelp account',false)", [student.id, user.id]);
+    await c.query("INSERT INTO events (student_id, actor_id, kind, message, public) VALUES ($1,$2,'account','Student created their UniSprint account',false)", [student.id, user.id]);
     return { user };
   });
   if (result.error) return res.status(400).json({ error: result.error });

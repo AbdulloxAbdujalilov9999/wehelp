@@ -99,7 +99,7 @@ router.post("/students", async (req, res) => {
       b.program_type || "degree", b.target_intake || null, b.package || null, b.source || "agency", b.notes || null,
       toInt(b.agent_id) || req.user.id, stage]
   );
-  await svc.addEvent(s.id, req.user.id, "created", "Added to WeHelp", true);
+  await svc.addEvent(s.id, req.user.id, "created", "Added to UniSprint", true);
   res.status(201).json({ student: s });
 });
 
